@@ -1,0 +1,13 @@
+/vendor/
+/var/
+/.phpunit.result.cache
+/.codebase-memory/
+/.idea/
+/.vscode/
+/.env.local
+/.env.*.local
+composer.phar
+phpunit.xml
+phpstan.neon
+/.php-cs-fixer.cache
+

@@ -1,0 +1,21 @@
+= Carting Checkout Readiness
+
+Carting owns mutable commercial intent. It must not convert an empty, expired, converted, abandoned, or currency-inconsistent cart into an Ordering handoff.
+
+== Canonical readiness checks
+
+Before a cart can produce `CartCheckoutHandoff`, the component checks:
+
+* cart status is `active`;
+* cart is not expired by `expiresAt`;
+* cart has at least one item;
+* every item currency matches the cart currency;
+* optional availability checker still accepts each requested quantity.
+
+== Responsibility boundary
+
+Carting does not create the final order. Carting creates a handoff payload. Ordering remains the owner of committed order documents.
+
+== Integration rule
+
+Producer components may provide availability, tax, promotion, or price-estimate services through Symfony service interfaces. Carting keeps those contracts minimal and does not absorb Storage, Payment, Shipment, or Ordering responsibilities.

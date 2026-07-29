@@ -1,0 +1,71 @@
+= Carting Output Surface Contract
+
+Carting exposes cart UI data through a neutral singular-word surface contract instead of a component-specific bridge.
+
+== Canonical word
+
+The canonical business word for this component is `cart`.
+
+Carting does not resolve Interfacing templates by PHP namespace, component class, bundle name, or bridge adapter. It exports the singular business word, the requested view, same-folder template paths, and named slots.
+
+[source,text]
+----
+word: cart
+view: summary
+templateKey: cart/summary
+primary template path: templates/cart/summary.html.twig
+----
+
+== Runtime behavior
+
+The host or Interfacing-side renderer should resolve only inside `templates/cart/`, in this order.
+
+[source,text]
+----
+templates/cart/summary.html.twig
+templates/cart/base.html.twig
+templates/cart/data.html.twig
+----
+
+Missing specialized templates are not runtime failures. If `templates/cart/summary.html.twig` is not present, the same `slots` payload can be rendered by `templates/cart/data.html.twig` or returned as normalized data.
+
+The renderer must not search plural folders, generic folders, component namespaces, bundle names, or bridge-specific paths. `templates/cart/` is the only UI folder for Carting surface rendering.
+
+== Slots
+
+Carting exports named slots, not a raw unlabelled payload.
+
+[source,text]
+----
+title
+word
+cartToken
+summary
+miniCart
+items
+actions
+navigation
+empty
+----
+
+These slots are the only contract between Carting and the template surface. The template decides where to place them in the page shell.
+
+== Responsibility split
+
+Carting owns:
+
+* cart data and cart mutations;
+* the `cart` singular word;
+* the `summary` view name;
+* named slot payloads;
+* fallback-ready normalized data.
+
+Interfacing owns:
+
+* template lookup under `templates/{word}/`;
+* shell/layout placement;
+* specialized templates;
+* same-folder data fallback rendering.
+
+No component-specific bridge is required for this contract.
+

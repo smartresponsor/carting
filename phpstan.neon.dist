@@ -1,0 +1,22 @@
+parameters:
+  level: 6
+  paths:
+    - src
+    - tests
+  ignoreErrors:
+    -
+      identifier: property.unusedType
+      path: src/Entity/Cart.php
+      count: 1
+    -
+      identifier: property.unusedType
+      path: src/Entity/CartAdjustmentEntity.php
+      count: 1
+    -
+      identifier: property.unusedType
+      path: src/Entity/CartCheckoutHandoffEntity.php
+      count: 1
+    -
+      identifier: property.unusedType
+      path: src/Entity/CartItem.php
+      count: 1

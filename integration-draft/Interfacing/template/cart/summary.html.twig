@@ -1,0 +1,23 @@
+{% set surface = surface|default({}) %}
+{% set slots = surface.slots|default({}) %}
+{% set summary = slots.summary|default(null) %}
+
+<section class="cart-summary" data-cart-token="{{ slots.cartToken|default('') }}">
+    <h1>{{ slots.title|default('Cart') }}</h1>
+
+    {% if slots.empty|default(true) %}
+        <p>Your cart is empty.</p>
+    {% else %}
+        <ul>
+            {% for item in slots.items|default([]) %}
+                <li>
+                    <span>{{ item.title }}</span>
+                    <span>{{ item.quantity }}</span>
+                    <span>{{ item.lineTotalMinor }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <p>Total: {{ summary.totalMinor|default(0) }}</p>
+    {% endif %}
+</section>

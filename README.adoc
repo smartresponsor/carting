@@ -1,0 +1,29 @@
+= Carting Component
+
+Carting owns mutable commerce intent before an order is committed.
+
+== Responsibility
+
+Carting owns carts, cart items, item mutation, cart summaries, anonymous/authenticated cart merge, checkout handoff payloads, and outgoing surface contracts for UI integration.
+
+Carting does not own catalog/product, inventory, tax, promotion, payment, shipment, or committed order documents.
+
+== Canon
+
+* Namespace: `App\Carting`
+* Business stem: `Cart`
+* Doctrine table prefix: `cart_`
+* Symfony-oriented structure only
+* No `/src/Domain/`
+* No port/adapter vocabulary
+* Persistent cart data belongs to the business/user data store, normally PostgreSQL.
+* System/config metadata, if later introduced, belongs to the system store, normally SQLite.
+
+== Integration Sequence
+
+[source,text]
+----
+Catalog/Product -> Carting -> Ordering -> Paying -> Shipping
+----
+
+Carting creates a checkout handoff; Ordering converts that handoff into a committed order.

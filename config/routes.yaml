@@ -1,0 +1,3 @@
+carting_cart:
+  resource: '../src/Controller/'
+  type: attribute

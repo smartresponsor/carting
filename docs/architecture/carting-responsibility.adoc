@@ -1,0 +1,29 @@
+= Carting Responsibility
+
+Carting is the mutable cart responsibility between product selection and committed order creation.
+
+== Owns
+
+* cart identity
+* anonymous and authenticated carts
+* cart items
+* item quantity mutation
+* item price/title snapshot
+* cart summary
+* cart merge
+* checkout handoff payload
+* outgoing UI surface contract
+
+== Does Not Own
+
+* product catalog
+* inventory storage
+* payment authorization or capture
+* shipment creation
+* committed order document
+* tax calculation engine
+* promotion engine
+
+== Checkout Boundary
+
+Carting produces a checkout handoff. Ordering consumes the handoff and creates the committed order.

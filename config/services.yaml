@@ -1,0 +1,16 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+
+  App\Carting\:
+    resource: '../src/'
+    exclude:
+      - '../src/Entity/'
+      - '../src/DependencyInjection/'
+      - '../src/Surface/'
+      - '../src/Value/'
+  App\Carting\ServiceInterface\Cart\CartOfferProviderInterface:
+    alias: App\Carting\Service\Cart\CartOfferProvider
+  App\Carting\RepositoryInterface\CartRepositoryInterface:
+    alias: App\Carting\Repository\CartRepository

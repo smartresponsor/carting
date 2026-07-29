@@ -1,0 +1,13 @@
+{% set surface = surface|default({}) %}
+{% set slots = surface.slots|default({}) %}
+
+<section class="surface surface-cart" data-surface-word="{{ surface.word|default('cart') }}" data-surface-view="{{ surface.view|default('summary') }}">
+    {% block surface_title %}
+        <h1>{{ slots.title|default('Cart') }}</h1>
+    {% endblock %}
+
+    {% block surface_content %}
+        {% include 'templates/cart/summary.html.twig' with {surface: surface} only %}
+    {% endblock %}
+</section>
+

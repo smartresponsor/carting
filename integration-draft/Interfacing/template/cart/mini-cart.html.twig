@@ -1,0 +1,8 @@
+{% set surface = surface|default({}) %}
+{% set slots = surface.slots|default({}) %}
+{% set miniCart = slots.miniCart|default(null) %}
+
+<a href="/cart" class="mini-cart" data-surface-word="{{ surface.word|default('cart') }}">
+    Cart
+    <span>{{ miniCart.itemCount|default(0) }}</span>
+</a>

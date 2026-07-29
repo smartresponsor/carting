@@ -1,0 +1,88 @@
+= Carting Wave Plan
+
+== Wave 1
+
+Component skeleton, composer, bundle, DI, configuration, docs, delivery surface.
+
+== Wave 2
+
+Core Doctrine entities and repositories: Cart, CartItem, CartAdjustment, CartCheckoutHandoff.
+
+== Wave 3
+
+Core services: mutation, summary, merge, token, checkout preparation.
+
+== Wave 4
+
+External Symfony-oriented service interfaces for offer snapshot, availability, checkout consumer, and UI surface.
+
+== Wave 5
+
+HTTP/API/Form surface: cart display, add/update/remove items, checkout entry.
+
+== Wave 6
+
+Checkout handoff payload and persistence boundary toward Ordering.
+
+== Wave 7
+
+Outgoing UI surface contract plus non-destructive Interfacing template draft files.
+
+== Wave 8: Checkout readiness and lifecycle hardening
+
+Adds active-cart lifecycle guards, checkout-readiness validation, and explicit estimate provider interfaces for pricing, tax, and promotion integrations.
+
+Touched areas:
+
+* `src/Service/Cart/CartLifecycleGuardService.php`
+* `src/Service/Cart/CartCheckoutReadinessService.php`
+* `src/Service/Cart/CartCheckoutPreparationService.php`
+* `src/Service/Cart/CartMutationService.php`
+* `src/ServiceInterface/Cart/*EstimateProviderInterface.php`
+* `src/Value/CartCheckoutReadinessValue.php`
+* `tests/Service/CartCheckoutReadinessServiceTest.php`
+* `docs/architecture/carting-checkout-readiness.adoc`
+
+
+== Wave 9: Output surface contract hardening
+
+Strengthens the Carting output surface so host/Interfacing renderers receive stable singular-word slot contracts instead of Doctrine entities, untyped action arrays, or component-specific bridges.
+
+Touched areas:
+
+* `src/Service/Cart/CartSurfaceProvider.php`
+* `src/Service/Cart/CartSurfaceContractFactory.php`
+* `src/ServiceInterface/Cart/CartSurfaceProviderInterface.php`
+* `src/Value/CartSurfaceContract.php`
+* `src/Value/CartSurfaceActionValue.php`
+* `src/Value/CartMiniCartValue.php`
+* `src/Value/CartNavigationItemValue.php`
+* `tests/Service/CartSurfaceContractFactoryTest.php`
+* `docs/architecture/carting-output-surface-contract.adoc`
+
+== Wave 10: Singular-word template resolution
+
+Replaces the old Carting-to-Interfacing bridge draft with a minimal singular-word surface model. Carting exports `word=cart`, `view=summary`, template candidates under `templates/cart/`, and named slots that can be rendered by a specialized template or by same-folder data fallback rendering.
+
+Touched areas:
+
+* `src/Service/Cart/CartSurfaceProvider.php`
+* `src/Service/Cart/CartSurfaceContractFactory.php`
+* `src/ServiceInterface/Cart/CartSurfaceProviderInterface.php`
+* `src/Value/CartSurfaceContract.php`
+* `integration-draft/Interfacing/templates/cart/*`
+* `tests/Service/CartSurfaceContractFactoryTest.php`
+* `docs/architecture/carting-output-surface-contract.adoc`
+
+
+== Wave 12 - Cart single-folder surface final seal
+
+Finalizes the Carting producer-side example around one singular business word and one template folder. Carting exports `word=cart`, `view=summary`, named slots, and same-folder template paths under `templates/cart/`. No plural folder, generic folder, namespace path, or component-specific bridge path participates in rendering.
+
+Touched areas:
+
+* `docs/architecture/carting-output-surface-contract.adoc`
+* `delivery/waves/WAVE-PLAN.adoc`
+
+Removed stale local wave marker files from the cumulative slice so simple drift scans no longer report deleted plural/generic/bridge paths as active repository content.
+
