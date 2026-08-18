@@ -123,6 +123,10 @@ class CartItem
 
     public function attachToCart(Cart $cart): void
     {
+        if ($cart->getCurrencyCode() !== $this->currencyCode) {
+            throw new \DomainException('Cart item currency must match cart currency.');
+        }
+
         $this->cart = $cart;
     }
 

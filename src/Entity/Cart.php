@@ -63,6 +63,11 @@ class Cart
             throw new \InvalidArgumentException('Cart currency code must be a three-letter ISO-style code.');
         }
 
+        $ownerReference = null === $ownerReference ? null : trim($ownerReference);
+        if ('' === $ownerReference) {
+            throw new \InvalidArgumentException('Cart owner reference must not be empty when provided.');
+        }
+
         $this->cartToken = $cartToken;
         $this->currencyCode = $currencyCode;
         $this->ownerReference = $ownerReference;
@@ -116,6 +121,11 @@ class Cart
 
     public function assignOwner(string $ownerReference): void
     {
+        $ownerReference = trim($ownerReference);
+        if ('' === $ownerReference) {
+            throw new \InvalidArgumentException('Cart owner reference must not be empty.');
+        }
+
         $this->ownerReference = $ownerReference;
         $this->touch();
     }
@@ -134,6 +144,10 @@ class Cart
 
     public function setExpiresAt(?\DateTimeImmutable $expiresAt): void
     {
+        if (null !== $expiresAt && $expiresAt < $this->createdAt) {
+            throw new \InvalidArgumentException('Cart expiration timestamp cannot precede creation timestamp.');
+        }
+
         $this->expiresAt = $expiresAt;
         $this->touch();
     }

@@ -31,6 +31,11 @@ class CartAdjustmentEntity
 
     public function __construct(Cart $cart, CartAdjustmentType $type, string $label, int $amountMinor)
     {
+        $label = trim($label);
+        if ('' === $label) {
+            throw new \InvalidArgumentException('Cart adjustment label must not be empty.');
+        }
+
         $this->cart = $cart;
         $this->type = $type;
         $this->label = $label;

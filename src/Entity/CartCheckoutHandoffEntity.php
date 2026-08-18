@@ -34,6 +34,11 @@ class CartCheckoutHandoffEntity
     /** @param array<string, mixed> $payload */
     public function __construct(Cart $cart, string $handoffReference, array $payload)
     {
+        $handoffReference = trim($handoffReference);
+        if ('' === $handoffReference) {
+            throw new \InvalidArgumentException('Cart checkout handoff reference must not be empty.');
+        }
+
         $this->cart = $cart;
         $this->handoffReference = $handoffReference;
         $this->payload = $payload;
