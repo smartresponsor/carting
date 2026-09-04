@@ -11,7 +11,7 @@ This module is **not** responsible for product inventory validation, price catal
 - Cart item listing, addition, deletion, and quantity mutation.
 - Captures item price and title snapshots to lock selected item rates.
 - Carts merging (e.g. merging guest carts on login).
-- Prepares checkout handoff payloads for consumption by the `Ordering` service.
+- Prepares checkout handoff payloads, persists them as `checkout_pending`, and leaves final conversion to downstream `Ordering` acceptance.
 
 ### What this repository does not claim yet
 - Catalog updates or product stock adjustments.
@@ -20,11 +20,13 @@ This module is **not** responsible for product inventory validation, price catal
 
 ## Runtime Surface & Entrypoints
 
-The Carting bundle exposes services, entities, value objects, host-neutral surface contracts, and explicit cart business routes. It contains no generic Cruding controllers or generic CRUD route grammar:
+The Carting bundle exposes services, entities, DTOs, snapshots, host-neutral surface contracts, and explicit cart business routes. It contains no generic Cruding controllers or generic CRUD route grammar:
 - `src/Controller/CartController.php` - Cart-owned business endpoints for summary, item mutation, and checkout handoff.
 - `src/Service/` - Cart operations, item updates, merging logic, and checkout generation.
 - `src/Entity/` - Doctrine models for cart and cart item state persistence.
-- `src/Value/` - immutable summaries, handoff payloads, and UI surface values.
+- `src/DTO/Cart/` - immutable cart transfer objects with explicit `DTO` suffixes.
+- `src/Contract/Cart/` - renderable cart surface contracts.
+- `src/Snapshot/Cart/` - immutable external offer snapshots.
 - `src/ServiceInterface/` - narrow integration contracts for external offer, availability, and estimate providers.
 - `src/CartingBundle.php` - Bundle configuration.
 
@@ -41,6 +43,11 @@ vendor/bin/phpunit
 ```
 
 ## Local Composer Path Installation
+
+Composer inventories are environment-specific:
+
+- `composer.json` is the local development inventory and resolves sibling components through Composer `path` repositories with `symlink: true`.
+- `composer.prod.json` is the production bundle inventory and resolves component dependencies from their Git/VCS repositories.
 
 Include Carting as a path repository within your Symfony application:
 

@@ -7,7 +7,9 @@ namespace App\Carting\Enum;
 enum CartStatus: string
 {
     case Active = 'active';
+    case CheckoutPending = 'checkout_pending';
     case Converted = 'converted';
+    case Merged = 'merged';
     case Abandoned = 'abandoned';
     case Expired = 'expired';
 }

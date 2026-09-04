@@ -28,6 +28,12 @@ class CartCheckoutHandoffEntity
     #[ORM\Column(name: 'payload', type: 'json')]
     private array $payload;
 
+    #[ORM\Column(name: 'downstream_reference', type: 'string', length: 191, nullable: true)]
+    private ?string $downstreamReference = null;
+
+    #[ORM\Column(name: 'accepted_at', type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $acceptedAt = null;
+
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
@@ -62,8 +68,33 @@ class CartCheckoutHandoffEntity
     {
         return $this->payload;
     }
+    public function getDownstreamReference(): ?string
+    {
+        return $this->downstreamReference;
+    }
+    public function getAcceptedAt(): ?\DateTimeImmutable
+    {
+        return $this->acceptedAt;
+    }
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function markAccepted(string $downstreamReference): void
+    {
+        $downstreamReference = trim($downstreamReference);
+        if ('' === $downstreamReference) {
+            throw new \InvalidArgumentException('Cart checkout downstream reference must not be empty.');
+        }
+
+        if (null !== $this->downstreamReference && $this->downstreamReference !== $downstreamReference) {
+            throw new \LogicException('Cart checkout handoff is already accepted with a different downstream reference.');
+        }
+
+        if (null === $this->downstreamReference) {
+            $this->downstreamReference = $downstreamReference;
+            $this->acceptedAt = new \DateTimeImmutable();
+        }
     }
 }

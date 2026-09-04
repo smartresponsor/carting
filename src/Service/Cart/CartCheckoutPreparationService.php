@@ -6,7 +6,7 @@ namespace App\Carting\Service\Cart;
 
 use App\Carting\Entity\Cart;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
-use App\Carting\Value\CartCheckoutPayload;
+use App\Carting\DTO\Cart\CartCheckoutPayloadDTO;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class CartCheckoutPreparationService
@@ -14,6 +14,7 @@ final class CartCheckoutPreparationService
     public function __construct(
         private readonly CartSummaryService $summaryService,
         private readonly CartCheckoutReadinessService $readinessService,
+        private readonly CartAdjustmentEstimateService $adjustmentEstimateService,
         private readonly EntityManagerInterface $entityManager,
     ) {}
 
@@ -25,7 +26,11 @@ final class CartCheckoutPreparationService
             throw new \LogicException(implode(' ', $readiness->messages));
         }
 
+        $this->adjustmentEstimateService->refresh($cart);
         $summary = $this->summaryService->summarize($cart);
+        if ($summary->totalMinor < 0) {
+            throw new \LogicException('Cart total cannot be negative after applying estimates.');
+        }
         $lines = [];
 
         foreach ($summary->items as $item) {
@@ -38,7 +43,7 @@ final class CartCheckoutPreparationService
             ];
         }
 
-        $payload = new CartCheckoutPayload(
+        $payload = new CartCheckoutPayloadDTO(
             $cart->getCartToken(),
             $cart->getOwnerReference(),
             $cart->getCurrencyCode(),
@@ -48,7 +53,7 @@ final class CartCheckoutPreparationService
         );
 
         $handoff = new CartCheckoutHandoffEntity($cart, bin2hex(random_bytes(24)), $payload->toArray());
-        $cart->markConverted();
+        $cart->markCheckoutPending();
         $this->entityManager->persist($handoff);
         $this->entityManager->flush();
 

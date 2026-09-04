@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Carting\Service\Cart;
 
-use App\Carting\Value\CartMiniCartValue;
-use App\Carting\Value\CartNavigationItemValue;
-use App\Carting\Value\CartSummaryValue;
-use App\Carting\Value\CartSurfaceActionValue;
-use App\Carting\Value\CartSurfaceContract;
+use App\Carting\DTO\Cart\CartMiniCartDTO;
+use App\Carting\DTO\Cart\CartNavigationItemDTO;
+use App\Carting\DTO\Cart\CartSummaryDTO;
+use App\Carting\DTO\Cart\CartSurfaceActionDTO;
+use App\Carting\Contract\Cart\CartSurfaceContract;
 
 final class CartSurfaceContractFactory
 {
-    public function createSummarySurface(CartSummaryValue $summary): CartSurfaceContract
+    public function createSummarySurface(CartSummaryDTO $summary): CartSurfaceContract
     {
         $actions = $this->createActions($summary);
         $miniCart = $this->createMiniCart($summary, $actions);
@@ -32,29 +32,29 @@ final class CartSurfaceContractFactory
         );
     }
 
-    /** @return list<CartSurfaceActionValue> */
-    public function createActions(CartSummaryValue $summary): array
+    /** @return list<CartSurfaceActionDTO> */
+    public function createActions(CartSummaryDTO $summary): array
     {
         $actions = [
-            new CartSurfaceActionValue('view', 'View cart', 'GET', '/cart', true),
+            new CartSurfaceActionDTO('view', 'View cart', 'GET', '/cart', true),
         ];
 
         if ($summary->itemCount > 0) {
-            $actions[] = new CartSurfaceActionValue('checkout', 'Checkout', 'POST', '/cart/checkout', true);
-            $actions[] = new CartSurfaceActionValue('clear', 'Clear cart', 'DELETE', '/cart', false, true);
+            $actions[] = new CartSurfaceActionDTO('checkout', 'Checkout', 'POST', '/cart/checkout', true);
+            $actions[] = new CartSurfaceActionDTO('clear', 'Clear cart', 'DELETE', '/cart', false, true);
         }
 
         return $actions;
     }
 
-    /** @param list<CartSurfaceActionValue> $actions */
-    public function createMiniCart(CartSummaryValue $summary, array $actions = []): CartMiniCartValue
+    /** @param list<CartSurfaceActionDTO> $actions */
+    public function createMiniCart(CartSummaryDTO $summary, array $actions = []): CartMiniCartDTO
     {
         if ([] === $actions) {
             $actions = $this->createActions($summary);
         }
 
-        return new CartMiniCartValue(
+        return new CartMiniCartDTO(
             $summary->cartToken,
             $summary->currencyCode,
             $summary->itemCount,
@@ -65,11 +65,11 @@ final class CartSurfaceContractFactory
         );
     }
 
-    /** @return list<CartNavigationItemValue> */
-    public function createNavigation(CartSummaryValue $summary): array
+    /** @return list<CartNavigationItemDTO> */
+    public function createNavigation(CartSummaryDTO $summary): array
     {
         return [
-            new CartNavigationItemValue('cart', 'Cart', '/cart', $summary->itemCount),
+            new CartNavigationItemDTO('cart', 'Cart', '/cart', $summary->itemCount),
         ];
     }
 
@@ -87,12 +87,12 @@ final class CartSurfaceContractFactory
     }
 
     /**
-     * @param list<CartSurfaceActionValue> $actions
-     * @param list<CartNavigationItemValue> $navigation
+     * @param list<CartSurfaceActionDTO> $actions
+     * @param list<CartNavigationItemDTO> $navigation
      *
      * @return array<string, mixed>
      */
-    private function createSummarySlots(CartSummaryValue $summary, CartMiniCartValue $miniCart, array $actions, array $navigation): array
+    private function createSummarySlots(CartSummaryDTO $summary, CartMiniCartDTO $miniCart, array $actions, array $navigation): array
     {
         return [
             'title' => 'Cart',
@@ -107,8 +107,8 @@ final class CartSurfaceContractFactory
         ];
     }
 
-    /** @param list<CartSurfaceActionValue> $actions */
-    private function findAction(array $actions, string $key): ?CartSurfaceActionValue
+    /** @param list<CartSurfaceActionDTO> $actions */
+    private function findAction(array $actions, string $key): ?CartSurfaceActionDTO
     {
         foreach ($actions as $action) {
             if ($action->key === $key) {

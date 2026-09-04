@@ -16,7 +16,7 @@ class CartAdjustmentEntity
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Cart::class)]
+    #[ORM\ManyToOne(targetEntity: Cart::class, inversedBy: 'adjustments')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Cart $cart;
 
