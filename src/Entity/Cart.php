@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Entity;
 
+use App\Carting\Enum\CartAdjustmentType;
 use App\Carting\Enum\CartStatus;
 use App\Carting\Repository\CartRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -37,6 +38,10 @@ class Cart
     #[ORM\OneToMany(mappedBy: 'cart', targetEntity: CartItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $items;
 
+    /** @var Collection<int, CartAdjustmentEntity> */
+    #[ORM\OneToMany(mappedBy: 'cart', targetEntity: CartAdjustmentEntity::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $adjustments;
+
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
@@ -63,10 +68,16 @@ class Cart
             throw new \InvalidArgumentException('Cart currency code must be a three-letter ISO-style code.');
         }
 
+        $ownerReference = null === $ownerReference ? null : trim($ownerReference);
+        if ('' === $ownerReference) {
+            throw new \InvalidArgumentException('Cart owner reference must not be empty when provided.');
+        }
+
         $this->cartToken = $cartToken;
         $this->currencyCode = $currencyCode;
         $this->ownerReference = $ownerReference;
         $this->items = new ArrayCollection();
+        $this->adjustments = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->updatedAt = $this->createdAt;
     }
@@ -114,32 +125,83 @@ class Cart
         return $this->items;
     }
 
+    /** @return Collection<int, CartAdjustmentEntity> */
+    public function getAdjustments(): Collection
+    {
+        return $this->adjustments;
+    }
+
     public function assignOwner(string $ownerReference): void
     {
+        $this->assertActiveFor('assign owner to');
+
+        $ownerReference = trim($ownerReference);
+        if ('' === $ownerReference) {
+            throw new \InvalidArgumentException('Cart owner reference must not be empty.');
+        }
+
         $this->ownerReference = $ownerReference;
+        $this->touch();
+    }
+
+    public function markCheckoutPending(): void
+    {
+        $this->assertActiveFor('mark checkout pending for');
+        $this->status = CartStatus::CheckoutPending;
         $this->touch();
     }
 
     public function markConverted(): void
     {
+        if (CartStatus::CheckoutPending !== $this->status) {
+            throw new \LogicException(sprintf(
+                'Cannot convert cart "%s" because cart status is "%s".',
+                $this->cartToken,
+                $this->status->value,
+            ));
+        }
+
         $this->status = CartStatus::Converted;
+        $this->touch();
+    }
+
+    public function markMerged(): void
+    {
+        $this->assertActiveFor('mark merged');
+        $this->status = CartStatus::Merged;
         $this->touch();
     }
 
     public function markExpired(): void
     {
+        $this->assertActiveFor('expire');
         $this->status = CartStatus::Expired;
+        $this->touch();
+    }
+
+    public function markAbandoned(): void
+    {
+        $this->assertActiveFor('abandon');
+        $this->status = CartStatus::Abandoned;
         $this->touch();
     }
 
     public function setExpiresAt(?\DateTimeImmutable $expiresAt): void
     {
+        $this->assertActiveFor('change expiration for');
+
+        if (null !== $expiresAt && $expiresAt < $this->createdAt) {
+            throw new \InvalidArgumentException('Cart expiration timestamp cannot precede creation timestamp.');
+        }
+
         $this->expiresAt = $expiresAt;
         $this->touch();
     }
 
     public function addItem(CartItem $item): void
     {
+        $this->assertActiveFor('add item to');
+
         if (!$this->items->contains($item)) {
             $this->items->add($item);
             $item->attachToCart($this);
@@ -149,7 +211,40 @@ class Cart
 
     public function removeItem(CartItem $item): void
     {
+        $this->assertActiveFor('remove item from');
+
         if ($this->items->removeElement($item)) {
+            $this->touch();
+        }
+    }
+
+    public function addAdjustment(CartAdjustmentEntity $adjustment): void
+    {
+        $this->assertActiveFor('add adjustment to');
+
+        if ($adjustment->getCart() !== $this) {
+            throw new \DomainException('Cart adjustment must belong to this cart.');
+        }
+
+        if (!$this->adjustments->contains($adjustment)) {
+            $this->adjustments->add($adjustment);
+            $this->touch();
+        }
+    }
+
+    public function removeAdjustmentsOfType(CartAdjustmentType $type): void
+    {
+        $this->assertActiveFor('remove adjustments from');
+
+        $changed = false;
+        foreach ($this->adjustments->toArray() as $adjustment) {
+            if ($adjustment->getType() === $type) {
+                $this->adjustments->removeElement($adjustment);
+                $changed = true;
+            }
+        }
+
+        if ($changed) {
             $this->touch();
         }
     }
@@ -157,5 +252,19 @@ class Cart
     public function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    private function assertActiveFor(string $operation): void
+    {
+        if (CartStatus::Active === $this->status) {
+            return;
+        }
+
+        throw new \LogicException(sprintf(
+            'Cannot %s cart "%s" because cart status is "%s".',
+            $operation,
+            $this->cartToken,
+            $this->status->value,
+        ));
     }
 }

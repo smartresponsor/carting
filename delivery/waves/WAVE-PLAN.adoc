@@ -39,8 +39,8 @@ Touched areas:
 * `src/Service/Cart/CartCheckoutPreparationService.php`
 * `src/Service/Cart/CartMutationService.php`
 * `src/ServiceInterface/Cart/*EstimateProviderInterface.php`
-* `src/Value/CartCheckoutReadinessValue.php`
-* `tests/Service/CartCheckoutReadinessServiceTest.php`
+* `src/DTO/Cart/CartCheckoutReadinessDTO.php`
+* `tests/Unit/Service/Cart/CartCheckoutReadinessServiceTest.php`
 * `docs/architecture/carting-checkout-readiness.adoc`
 
 
@@ -53,11 +53,11 @@ Touched areas:
 * `src/Service/Cart/CartSurfaceProvider.php`
 * `src/Service/Cart/CartSurfaceContractFactory.php`
 * `src/ServiceInterface/Cart/CartSurfaceProviderInterface.php`
-* `src/Value/CartSurfaceContract.php`
-* `src/Value/CartSurfaceActionValue.php`
-* `src/Value/CartMiniCartValue.php`
-* `src/Value/CartNavigationItemValue.php`
-* `tests/Service/CartSurfaceContractFactoryTest.php`
+* `src/Contract/Cart/CartSurfaceContract.php`
+* `src/DTO/Cart/CartSurfaceActionDTO.php`
+* `src/DTO/Cart/CartMiniCartDTO.php`
+* `src/DTO/Cart/CartNavigationItemDTO.php`
+* `tests/Unit/Service/Cart/CartSurfaceContractFactoryTest.php`
 * `docs/architecture/carting-output-surface-contract.adoc`
 
 == Wave 10: Singular-word template resolution
@@ -69,9 +69,9 @@ Touched areas:
 * `src/Service/Cart/CartSurfaceProvider.php`
 * `src/Service/Cart/CartSurfaceContractFactory.php`
 * `src/ServiceInterface/Cart/CartSurfaceProviderInterface.php`
-* `src/Value/CartSurfaceContract.php`
+* `src/Contract/Cart/CartSurfaceContract.php`
 * `integration-draft/Interfacing/templates/cart/*`
-* `tests/Service/CartSurfaceContractFactoryTest.php`
+* `tests/Unit/Service/Cart/CartSurfaceContractFactoryTest.php`
 * `docs/architecture/carting-output-surface-contract.adoc`
 
 

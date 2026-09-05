@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Carting\Entity;
 
-use App\Carting\Repository\CartItemRepository;
+use App\Carting\Enum\CartStatus;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: CartItemRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: 'cart_item')]
 #[ORM\Index(columns: ['offer_reference'], name: 'cart_item_offer_reference_idx')]
 class CartItem
@@ -123,11 +123,17 @@ class CartItem
 
     public function attachToCart(Cart $cart): void
     {
+        if ($cart->getCurrencyCode() !== $this->currencyCode) {
+            throw new \DomainException('Cart item currency must match cart currency.');
+        }
+
         $this->cart = $cart;
     }
 
     public function increaseBy(int $quantity): void
     {
+        $this->assertOwningCartActive();
+
         if ($quantity < 1) {
             throw new \InvalidArgumentException('Increase quantity must be positive.');
         }
@@ -137,6 +143,8 @@ class CartItem
 
     public function changeQuantity(int $quantity): void
     {
+        $this->assertOwningCartActive();
+
         if ($quantity < 1) {
             throw new \InvalidArgumentException('Cart item quantity must be at least 1.');
         }
@@ -152,5 +160,17 @@ class CartItem
     private function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    private function assertOwningCartActive(): void
+    {
+        if (!isset($this->cart) || CartStatus::Active === $this->cart->getStatus()) {
+            return;
+        }
+
+        throw new \LogicException(sprintf(
+            'Cannot mutate cart item because owning cart status is "%s".',
+            $this->cart->getStatus()->value,
+        ));
     }
 }

@@ -16,7 +16,7 @@ class CartAdjustmentEntity
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Cart::class)]
+    #[ORM\ManyToOne(targetEntity: Cart::class, inversedBy: 'adjustments')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Cart $cart;
 
@@ -31,6 +31,11 @@ class CartAdjustmentEntity
 
     public function __construct(Cart $cart, CartAdjustmentType $type, string $label, int $amountMinor)
     {
+        $label = trim($label);
+        if ('' === $label) {
+            throw new \InvalidArgumentException('Cart adjustment label must not be empty.');
+        }
+
         $this->cart = $cart;
         $this->type = $type;
         $this->label = $label;

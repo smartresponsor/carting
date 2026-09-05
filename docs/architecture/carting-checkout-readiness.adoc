@@ -1,6 +1,6 @@
 = Carting Checkout Readiness
 
-Carting owns mutable commercial intent. It must not convert an empty, expired, converted, abandoned, or currency-inconsistent cart into an Ordering handoff.
+Carting owns mutable commercial intent. Only an `active` cart is mutable. It must not prepare an empty, expired, checkout-pending, converted, merged, abandoned, or currency-inconsistent cart for an Ordering handoff. `converted` is reserved for successful checkout completion; a guest cart consumed by merge becomes `merged` instead.
 
 == Canonical readiness checks
 
@@ -14,8 +14,8 @@ Before a cart can produce `CartCheckoutHandoff`, the component checks:
 
 == Responsibility boundary
 
-Carting does not create the final order. Carting creates a handoff payload. Ordering remains the owner of committed order documents.
+Carting does not create the final order. Carting creates and persists a handoff payload, then moves the cart to `checkout_pending`. Ordering remains the owner of committed order documents; the cart may become `converted` only after downstream acceptance is confirmed.
 
 == Integration rule
 
-Producer components may provide availability, tax, promotion, or price-estimate services through Symfony service interfaces. Carting keeps those contracts minimal and does not absorb Storage, Payment, Shipment, or Ordering responsibilities.
+Producer components may provide availability, tax, promotion, or price-estimate services through Symfony service interfaces. Configured price, promotion, and tax providers are normalized into typed `CartAdjustmentEntity` records before the checkout payload is created. `CartCheckoutHandoffConsumerInterface` is consumed through `CartCheckoutHandoffCompletionService`; successful downstream acceptance records the returned reference and only then moves the cart from `checkout_pending` to `converted`. Carting keeps those contracts minimal and does not absorb Storage, Payment, Shipment, or Ordering responsibilities.

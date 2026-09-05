@@ -8,6 +8,6 @@ use App\Carting\Entity\Cart;
 
 interface CartPromotionEstimateProviderInterface
 {
-    /** @return list<array{label:string,amountMinor:int,metadata?:array<string,mixed>}> */
+    /** @return list<array{label:string,amountMinor:int}> */
     public function estimatePromotions(Cart $cart): array;
 }

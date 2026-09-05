@@ -8,9 +8,10 @@ services:
     exclude:
       - '../src/Entity/'
       - '../src/DependencyInjection/'
-      - '../src/Surface/'
-      - '../src/Value/'
+      - '../src/Contract/'
+      - '../src/DTO/'
+      - '../src/Snapshot/'
   App\Carting\ServiceInterface\Cart\CartOfferProviderInterface:
-    alias: App\Carting\Service\Cart\CartOfferProvider
+    alias: App\Carting\Service\Cart\CartUnavailableOfferProvider
   App\Carting\RepositoryInterface\CartRepositoryInterface:
     alias: App\Carting\Repository\CartRepository

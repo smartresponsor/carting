@@ -8,6 +8,6 @@ use App\Carting\Entity\Cart;
 
 interface CartTaxEstimateProviderInterface
 {
-    /** @return list<array{label:string,amountMinor:int,metadata?:array<string,mixed>}> */
+    /** @return list<array{label:string,amountMinor:int}> */
     public function estimateTaxes(Cart $cart): array;
 }

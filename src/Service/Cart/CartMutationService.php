@@ -9,7 +9,7 @@ use App\Carting\Entity\CartItem;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\ServiceInterface\Cart\CartAvailabilityCheckerInterface;
 use App\Carting\ServiceInterface\Cart\CartOfferProviderInterface;
-use App\Carting\Value\CartMutationResultValue;
+use App\Carting\DTO\Cart\CartMutationResultDTO;
 
 final class CartMutationService
 {
@@ -30,7 +30,7 @@ final class CartMutationService
         return $cart;
     }
 
-    public function addItem(Cart $cart, string $offerReference, int $quantity): CartMutationResultValue
+    public function addItem(Cart $cart, string $offerReference, int $quantity): CartMutationResultDTO
     {
         $this->lifecycleGuard->assertActive($cart, 'add item to');
 
@@ -49,7 +49,7 @@ final class CartMutationService
         $resultingQuantity = $quantity + ($existingItem?->getQuantity() ?? 0);
 
         if ($this->availabilityChecker && !$this->availabilityChecker->isAvailable($offerReference, $resultingQuantity)) {
-            return new CartMutationResultValue(false, 'Offer is not available in the requested quantity.', $this->summaryService->summarize($cart));
+            return new CartMutationResultDTO(false, 'Offer is not available in the requested quantity.', $this->summaryService->summarize($cart));
         }
 
         $snapshot = $this->offerProvider->provideOfferSnapshot($offerReference, $quantity);
@@ -71,7 +71,7 @@ final class CartMutationService
             $cart->touch();
             $this->cartRepository->save($cart);
 
-            return new CartMutationResultValue(true, 'Cart item quantity increased.', $this->summaryService->summarize($cart));
+            return new CartMutationResultDTO(true, 'Cart item quantity increased.', $this->summaryService->summarize($cart));
         }
 
         $cart->addItem(new CartItem(
@@ -85,10 +85,10 @@ final class CartMutationService
 
         $this->cartRepository->save($cart);
 
-        return new CartMutationResultValue(true, 'Cart item added.', $this->summaryService->summarize($cart));
+        return new CartMutationResultDTO(true, 'Cart item added.', $this->summaryService->summarize($cart));
     }
 
-    public function updateItemQuantity(Cart $cart, int $cartItemId, int $quantity): CartMutationResultValue
+    public function updateItemQuantity(Cart $cart, int $cartItemId, int $quantity): CartMutationResultDTO
     {
         $this->lifecycleGuard->assertActive($cart, 'update item quantity on');
 
@@ -98,14 +98,14 @@ final class CartMutationService
                 $cart->touch();
                 $this->cartRepository->save($cart);
 
-                return new CartMutationResultValue(true, 'Cart item quantity updated.', $this->summaryService->summarize($cart));
+                return new CartMutationResultDTO(true, 'Cart item quantity updated.', $this->summaryService->summarize($cart));
             }
         }
 
-        return new CartMutationResultValue(false, 'Cart item was not found.', $this->summaryService->summarize($cart));
+        return new CartMutationResultDTO(false, 'Cart item was not found.', $this->summaryService->summarize($cart));
     }
 
-    public function removeItem(Cart $cart, int $cartItemId): CartMutationResultValue
+    public function removeItem(Cart $cart, int $cartItemId): CartMutationResultDTO
     {
         $this->lifecycleGuard->assertActive($cart, 'remove item from');
 
@@ -114,10 +114,10 @@ final class CartMutationService
                 $cart->removeItem($item);
                 $this->cartRepository->save($cart);
 
-                return new CartMutationResultValue(true, 'Cart item removed.', $this->summaryService->summarize($cart));
+                return new CartMutationResultDTO(true, 'Cart item removed.', $this->summaryService->summarize($cart));
             }
         }
 
-        return new CartMutationResultValue(false, 'Cart item was not found.', $this->summaryService->summarize($cart));
+        return new CartMutationResultDTO(false, 'Cart item was not found.', $this->summaryService->summarize($cart));
     }
 }

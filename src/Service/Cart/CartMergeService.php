@@ -50,7 +50,7 @@ final class CartMergeService
             }
         }
 
-        $guestCart->markConverted();
+        $guestCart->markMerged();
         $ownerCart->touch();
         $this->cartRepository->save($ownerCart);
         $this->cartRepository->save($guestCart);

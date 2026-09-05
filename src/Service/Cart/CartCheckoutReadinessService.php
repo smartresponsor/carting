@@ -7,7 +7,7 @@ namespace App\Carting\Service\Cart;
 use App\Carting\Entity\Cart;
 use App\Carting\Enum\CartStatus;
 use App\Carting\ServiceInterface\Cart\CartAvailabilityCheckerInterface;
-use App\Carting\Value\CartCheckoutReadinessValue;
+use App\Carting\DTO\Cart\CartCheckoutReadinessDTO;
 
 final class CartCheckoutReadinessService
 {
@@ -16,7 +16,7 @@ final class CartCheckoutReadinessService
         private readonly ?CartAvailabilityCheckerInterface $availabilityChecker = null,
     ) {}
 
-    public function inspect(Cart $cart): CartCheckoutReadinessValue
+    public function inspect(Cart $cart): CartCheckoutReadinessDTO
     {
         $messages = [];
 
@@ -43,9 +43,9 @@ final class CartCheckoutReadinessService
         }
 
         if ([] !== $messages) {
-            return CartCheckoutReadinessValue::blocked($messages);
+            return CartCheckoutReadinessDTO::blocked($messages);
         }
 
-        return CartCheckoutReadinessValue::ready();
+        return CartCheckoutReadinessDTO::ready();
     }
 }

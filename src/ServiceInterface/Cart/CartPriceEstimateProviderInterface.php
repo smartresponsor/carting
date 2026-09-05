@@ -8,6 +8,5 @@ use App\Carting\Entity\Cart;
 
 interface CartPriceEstimateProviderInterface
 {
-    /** @return array{subtotalMinor:int,totalMinor:int,adjustments?:list<array<string,mixed>>} */
-    public function estimate(Cart $cart): array;
+    public function estimateTotalMinor(Cart $cart): int;
 }
