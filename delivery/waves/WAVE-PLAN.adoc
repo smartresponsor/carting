@@ -34,13 +34,13 @@ Adds active-cart lifecycle guards, checkout-readiness validation, and explicit e
 
 Touched areas:
 
-* `src/Service/Cart/CartLifecycleGuardService.php`
-* `src/Service/Cart/CartCheckoutReadinessService.php`
-* `src/Service/Cart/CartCheckoutPreparationService.php`
-* `src/Service/Cart/CartMutationService.php`
-* `src/ServiceInterface/Cart/*EstimateProviderInterface.php`
-* `src/DTO/Cart/CartCheckoutReadinessDTO.php`
-* `tests/Unit/Service/Cart/CartCheckoutReadinessServiceTest.php`
+* `src/Service/CartLifecycleGuardService.php`
+* `src/Service/CartCheckoutReadinessService.php`
+* `src/Service/CartCheckoutPreparationService.php`
+* `src/Service/CartMutationService.php`
+* `src/ServiceInterface/*EstimateProviderInterface.php`
+* `src/DTO/CartCheckoutReadinessDTO.php`
+* `tests/Unit/Service/CartCheckoutReadinessServiceTest.php`
 * `docs/architecture/carting-checkout-readiness.adoc`
 
 
@@ -50,14 +50,14 @@ Strengthens the Carting output surface so host/Interfacing renderers receive sta
 
 Touched areas:
 
-* `src/Service/Cart/CartSurfaceProvider.php`
-* `src/Service/Cart/CartSurfaceContractFactory.php`
-* `src/ServiceInterface/Cart/CartSurfaceProviderInterface.php`
-* `src/Contract/Cart/CartSurfaceContract.php`
-* `src/DTO/Cart/CartSurfaceActionDTO.php`
-* `src/DTO/Cart/CartMiniCartDTO.php`
-* `src/DTO/Cart/CartNavigationItemDTO.php`
-* `tests/Unit/Service/Cart/CartSurfaceContractFactoryTest.php`
+* `src/Provider/CartSurfaceProvider.php`
+* `src/Factory/CartSurfaceContractFactory.php`
+* `src/ServiceInterface/CartSurfaceProviderInterface.php`
+* `src/Contract/CartSurfaceContract.php`
+* `src/DTO/CartSurfaceActionDTO.php`
+* `src/DTO/CartMiniCartDTO.php`
+* `src/DTO/CartNavigationItemDTO.php`
+* `tests/Unit/Service/CartSurfaceContractFactoryTest.php`
 * `docs/architecture/carting-output-surface-contract.adoc`
 
 == Wave 10: Singular-word template resolution
@@ -66,12 +66,12 @@ Replaces the old Carting-to-Interfacing bridge draft with a minimal singular-wor
 
 Touched areas:
 
-* `src/Service/Cart/CartSurfaceProvider.php`
-* `src/Service/Cart/CartSurfaceContractFactory.php`
-* `src/ServiceInterface/Cart/CartSurfaceProviderInterface.php`
-* `src/Contract/Cart/CartSurfaceContract.php`
+* `src/Provider/CartSurfaceProvider.php`
+* `src/Factory/CartSurfaceContractFactory.php`
+* `src/ServiceInterface/CartSurfaceProviderInterface.php`
+* `src/Contract/CartSurfaceContract.php`
 * `integration-draft/Interfacing/templates/cart/*`
-* `tests/Unit/Service/Cart/CartSurfaceContractFactoryTest.php`
+* `tests/Unit/Service/CartSurfaceContractFactoryTest.php`
 * `docs/architecture/carting-output-surface-contract.adoc`
 
 

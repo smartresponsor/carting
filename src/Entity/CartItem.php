@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: 'cart_item')]
 #[ORM\Index(columns: ['offer_reference'], name: 'cart_item_offer_reference_idx')]
+/**
+ * Defines the CartItem responsibility used by the Carting component runtime.
+ */
 class CartItem
 {
     #[ORM\Id]
@@ -46,7 +49,10 @@ class CartItem
     #[ORM\Column(name: 'updated_at', type: 'datetime_immutable')]
     private \DateTimeImmutable $updatedAt;
 
-    /** @param array<string, mixed> $metadata */
+    /**
+     * Initializes the dependencies and state required by this Carting runtime responsibility.
+     * @param array<string, mixed> $metadata
+     */
     public function __construct(string $offerReference, string $titleSnapshot, int $unitPriceMinor, string $currencyCode, int $quantity, array $metadata = [])
     {
         $offerReference = trim($offerReference);
@@ -83,44 +89,74 @@ class CartItem
         $this->updatedAt = $this->createdAt;
     }
 
+    /**
+     * Returns the value produced by getId for this Carting runtime responsibility.
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
+    /**
+     * Returns the value produced by getCart for this Carting runtime responsibility.
+     */
     public function getCart(): Cart
     {
         return $this->cart;
     }
+    /**
+     * Returns the value produced by getOfferReference for this Carting runtime responsibility.
+     */
     public function getOfferReference(): string
     {
         return $this->offerReference;
     }
+    /**
+     * Returns the value produced by getTitleSnapshot for this Carting runtime responsibility.
+     */
     public function getTitleSnapshot(): string
     {
         return $this->titleSnapshot;
     }
+    /**
+     * Returns the value produced by getUnitPriceMinor for this Carting runtime responsibility.
+     */
     public function getUnitPriceMinor(): int
     {
         return $this->unitPriceMinor;
     }
+    /**
+     * Returns the value produced by getCurrencyCode for this Carting runtime responsibility.
+     */
     public function getCurrencyCode(): string
     {
         return $this->currencyCode;
     }
+    /**
+     * Returns the value produced by getQuantity for this Carting runtime responsibility.
+     */
     public function getQuantity(): int
     {
         return $this->quantity;
     }
-    /** @return array<string, mixed> */
+    /**
+     * Returns the value produced by getMetadata for this Carting runtime responsibility.
+     * @return array<string, mixed>
+     */
     public function getMetadata(): array
     {
         return $this->metadata;
     }
+    /**
+     * Returns the value produced by getUpdatedAt for this Carting runtime responsibility.
+     */
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
+    /**
+     * Executes the attachToCart behavior owned by this Carting runtime responsibility.
+     */
     public function attachToCart(Cart $cart): void
     {
         if ($cart->getCurrencyCode() !== $this->currencyCode) {
@@ -130,6 +166,9 @@ class CartItem
         $this->cart = $cart;
     }
 
+    /**
+     * Executes the increaseBy behavior owned by this Carting runtime responsibility.
+     */
     public function increaseBy(int $quantity): void
     {
         $this->assertOwningCartActive();
@@ -141,6 +180,9 @@ class CartItem
         $this->touch();
     }
 
+    /**
+     * Executes the changeQuantity behavior owned by this Carting runtime responsibility.
+     */
     public function changeQuantity(int $quantity): void
     {
         $this->assertOwningCartActive();
@@ -152,16 +194,25 @@ class CartItem
         $this->touch();
     }
 
+    /**
+     * Returns the value produced by getLineTotalMinor for this Carting runtime responsibility.
+     */
     public function getLineTotalMinor(): int
     {
         return $this->unitPriceMinor * $this->quantity;
     }
 
+    /**
+     * Returns the value produced by touch for this Carting runtime responsibility.
+     */
     private function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
 
+    /**
+     * Executes the assertOwningCartActive behavior owned by this Carting runtime responsibility.
+     */
     private function assertOwningCartActive(): void
     {
         if (!isset($this->cart) || CartStatus::Active === $this->cart->getStatus()) {

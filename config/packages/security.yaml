@@ -1,0 +1,8 @@
+security:
+  providers:
+    carting_standalone:
+      memory: ~
+  firewalls:
+    main:
+      security: false
+

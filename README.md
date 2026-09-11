@@ -24,9 +24,9 @@ The Carting bundle exposes services, entities, DTOs, snapshots, host-neutral sur
 - `src/Controller/CartController.php` - Cart-owned business endpoints for summary, item mutation, and checkout handoff.
 - `src/Service/` - Cart operations, item updates, merging logic, and checkout generation.
 - `src/Entity/` - Doctrine models for cart and cart item state persistence.
-- `src/DTO/Cart/` - immutable cart transfer objects with explicit `DTO` suffixes.
-- `src/Contract/Cart/` - renderable cart surface contracts.
-- `src/Snapshot/Cart/` - immutable external offer snapshots.
+- `src/DTO/` - immutable cart transfer objects with explicit `DTO` suffixes.
+- `src/Contract/` - renderable cart surface contracts.
+- `src/Snapshot/` - immutable external offer snapshots.
 - `src/ServiceInterface/` - narrow integration contracts for external offer, availability, and estimate providers.
 - `src/CartingBundle.php` - Bundle configuration.
 

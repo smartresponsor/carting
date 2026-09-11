@@ -9,6 +9,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'cart_adjustment')]
+/**
+ * Defines the CartAdjustmentEntity responsibility used by the Carting component runtime.
+ */
 class CartAdjustmentEntity
 {
     #[ORM\Id]
@@ -29,6 +32,9 @@ class CartAdjustmentEntity
     #[ORM\Column(name: 'amount_minor', type: 'integer')]
     private int $amountMinor;
 
+    /**
+     * Initializes the dependencies and state required by this Carting runtime responsibility.
+     */
     public function __construct(Cart $cart, CartAdjustmentType $type, string $label, int $amountMinor)
     {
         $label = trim($label);
@@ -42,22 +48,37 @@ class CartAdjustmentEntity
         $this->amountMinor = $amountMinor;
     }
 
+    /**
+     * Returns the value produced by getId for this Carting runtime responsibility.
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
+    /**
+     * Returns the value produced by getCart for this Carting runtime responsibility.
+     */
     public function getCart(): Cart
     {
         return $this->cart;
     }
+    /**
+     * Returns the value produced by getAmountMinor for this Carting runtime responsibility.
+     */
     public function getAmountMinor(): int
     {
         return $this->amountMinor;
     }
+    /**
+     * Returns the value produced by getLabel for this Carting runtime responsibility.
+     */
     public function getLabel(): string
     {
         return $this->label;
     }
+    /**
+     * Returns the value produced by getType for this Carting runtime responsibility.
+     */
     public function getType(): CartAdjustmentType
     {
         return $this->type;
