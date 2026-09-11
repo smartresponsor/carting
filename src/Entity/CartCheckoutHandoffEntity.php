@@ -10,6 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'cart_checkout_handoff')]
 #[ORM\UniqueConstraint(name: 'cart_checkout_handoff_cart_unique', columns: ['cart_id'])]
 #[ORM\Index(columns: ['handoff_reference'], name: 'cart_checkout_handoff_reference_idx')]
+/**
+ * Defines the CartCheckoutHandoffEntity responsibility used by the Carting component runtime.
+ */
 class CartCheckoutHandoffEntity
 {
     #[ORM\Id]
@@ -37,7 +40,10 @@ class CartCheckoutHandoffEntity
     #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
-    /** @param array<string, mixed> $payload */
+    /**
+     * Initializes the dependencies and state required by this Carting runtime responsibility.
+     * @param array<string, mixed> $payload
+     */
     public function __construct(Cart $cart, string $handoffReference, array $payload)
     {
         $handoffReference = trim($handoffReference);
@@ -51,36 +57,60 @@ class CartCheckoutHandoffEntity
         $this->createdAt = new \DateTimeImmutable();
     }
 
+    /**
+     * Returns the value produced by getId for this Carting runtime responsibility.
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
+    /**
+     * Returns the value produced by getCart for this Carting runtime responsibility.
+     */
     public function getCart(): Cart
     {
         return $this->cart;
     }
+    /**
+     * Returns the value produced by getHandoffReference for this Carting runtime responsibility.
+     */
     public function getHandoffReference(): string
     {
         return $this->handoffReference;
     }
-    /** @return array<string, mixed> */
+    /**
+     * Returns the value produced by getPayload for this Carting runtime responsibility.
+     * @return array<string, mixed>
+     */
     public function getPayload(): array
     {
         return $this->payload;
     }
+    /**
+     * Returns the value produced by getDownstreamReference for this Carting runtime responsibility.
+     */
     public function getDownstreamReference(): ?string
     {
         return $this->downstreamReference;
     }
+    /**
+     * Returns the value produced by getAcceptedAt for this Carting runtime responsibility.
+     */
     public function getAcceptedAt(): ?\DateTimeImmutable
     {
         return $this->acceptedAt;
     }
+    /**
+     * Returns the value produced by getCreatedAt for this Carting runtime responsibility.
+     */
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
 
+    /**
+     * Executes the markAccepted behavior owned by this Carting runtime responsibility.
+     */
     public function markAccepted(string $downstreamReference): void
     {
         $downstreamReference = trim($downstreamReference);

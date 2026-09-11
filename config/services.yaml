@@ -11,7 +11,7 @@ services:
       - '../src/Contract/'
       - '../src/DTO/'
       - '../src/Snapshot/'
-  App\Carting\ServiceInterface\Cart\CartOfferProviderInterface:
-    alias: App\Carting\Service\Cart\CartUnavailableOfferProvider
+  App\Carting\ServiceInterface\CartOfferProviderInterface:
+    alias: App\Carting\Provider\CartUnavailableOfferProvider
   App\Carting\RepositoryInterface\CartRepositoryInterface:
     alias: App\Carting\Repository\CartRepository

@@ -15,6 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'cart_cart')]
 #[ORM\Index(columns: ['cart_token'], name: 'cart_cart_token_idx')]
 #[ORM\Index(columns: ['owner_reference'], name: 'cart_cart_owner_reference_idx')]
+/**
+ * Defines the Cart responsibility used by the Carting component runtime.
+ */
 class Cart
 {
     #[ORM\Id]
@@ -55,6 +58,9 @@ class Cart
     #[ORM\Column(type: 'integer', options: ['default' => 1])]
     private int $version = 1;
 
+    /**
+     * Initializes the dependencies and state required by this Carting runtime responsibility.
+     */
     public function __construct(string $cartToken, string $currencyCode, ?string $ownerReference = null)
     {
         $cartToken = trim($cartToken);
@@ -82,55 +88,91 @@ class Cart
         $this->updatedAt = $this->createdAt;
     }
 
+    /**
+     * Returns the value produced by getId for this Carting runtime responsibility.
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
+    /**
+     * Returns the value produced by getCartToken for this Carting runtime responsibility.
+     */
     public function getCartToken(): string
     {
         return $this->cartToken;
     }
+    /**
+     * Returns the value produced by getOwnerReference for this Carting runtime responsibility.
+     */
     public function getOwnerReference(): ?string
     {
         return $this->ownerReference;
     }
+    /**
+     * Returns the value produced by getCurrencyCode for this Carting runtime responsibility.
+     */
     public function getCurrencyCode(): string
     {
         return $this->currencyCode;
     }
+    /**
+     * Returns the value produced by getStatus for this Carting runtime responsibility.
+     */
     public function getStatus(): CartStatus
     {
         return $this->status;
     }
+    /**
+     * Returns the value produced by getCreatedAt for this Carting runtime responsibility.
+     */
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
     }
+    /**
+     * Returns the value produced by getUpdatedAt for this Carting runtime responsibility.
+     */
     public function getUpdatedAt(): \DateTimeImmutable
     {
         return $this->updatedAt;
     }
+    /**
+     * Returns the value produced by getExpiresAt for this Carting runtime responsibility.
+     */
     public function getExpiresAt(): ?\DateTimeImmutable
     {
         return $this->expiresAt;
     }
+    /**
+     * Returns the value produced by getVersion for this Carting runtime responsibility.
+     */
     public function getVersion(): int
     {
         return $this->version;
     }
 
-    /** @return Collection<int, CartItem> */
+    /**
+     * Returns the value produced by getItems for this Carting runtime responsibility.
+     * @return Collection<int, CartItem>
+     */
     public function getItems(): Collection
     {
         return $this->items;
     }
 
-    /** @return Collection<int, CartAdjustmentEntity> */
+    /**
+     * Returns the value produced by getAdjustments for this Carting runtime responsibility.
+     * @return Collection<int, CartAdjustmentEntity>
+     */
     public function getAdjustments(): Collection
     {
         return $this->adjustments;
     }
 
+    /**
+     * Executes the assignOwner behavior owned by this Carting runtime responsibility.
+     */
     public function assignOwner(string $ownerReference): void
     {
         $this->assertActiveFor('assign owner to');
@@ -144,6 +186,9 @@ class Cart
         $this->touch();
     }
 
+    /**
+     * Executes the markCheckoutPending behavior owned by this Carting runtime responsibility.
+     */
     public function markCheckoutPending(): void
     {
         $this->assertActiveFor('mark checkout pending for');
@@ -151,6 +196,9 @@ class Cart
         $this->touch();
     }
 
+    /**
+     * Executes the markConverted behavior owned by this Carting runtime responsibility.
+     */
     public function markConverted(): void
     {
         if (CartStatus::CheckoutPending !== $this->status) {
@@ -165,6 +213,9 @@ class Cart
         $this->touch();
     }
 
+    /**
+     * Executes the markMerged behavior owned by this Carting runtime responsibility.
+     */
     public function markMerged(): void
     {
         $this->assertActiveFor('mark merged');
@@ -172,6 +223,9 @@ class Cart
         $this->touch();
     }
 
+    /**
+     * Executes the markExpired behavior owned by this Carting runtime responsibility.
+     */
     public function markExpired(): void
     {
         $this->assertActiveFor('expire');
@@ -179,6 +233,9 @@ class Cart
         $this->touch();
     }
 
+    /**
+     * Executes the markAbandoned behavior owned by this Carting runtime responsibility.
+     */
     public function markAbandoned(): void
     {
         $this->assertActiveFor('abandon');
@@ -186,6 +243,9 @@ class Cart
         $this->touch();
     }
 
+    /**
+     * Executes the setExpiresAt behavior owned by this Carting runtime responsibility.
+     */
     public function setExpiresAt(?\DateTimeImmutable $expiresAt): void
     {
         $this->assertActiveFor('change expiration for');
@@ -198,6 +258,9 @@ class Cart
         $this->touch();
     }
 
+    /**
+     * Executes the addItem behavior owned by this Carting runtime responsibility.
+     */
     public function addItem(CartItem $item): void
     {
         $this->assertActiveFor('add item to');
@@ -209,6 +272,9 @@ class Cart
         }
     }
 
+    /**
+     * Executes the removeItem behavior owned by this Carting runtime responsibility.
+     */
     public function removeItem(CartItem $item): void
     {
         $this->assertActiveFor('remove item from');
@@ -218,6 +284,9 @@ class Cart
         }
     }
 
+    /**
+     * Executes the addAdjustment behavior owned by this Carting runtime responsibility.
+     */
     public function addAdjustment(CartAdjustmentEntity $adjustment): void
     {
         $this->assertActiveFor('add adjustment to');
@@ -232,6 +301,9 @@ class Cart
         }
     }
 
+    /**
+     * Executes the removeAdjustmentsOfType behavior owned by this Carting runtime responsibility.
+     */
     public function removeAdjustmentsOfType(CartAdjustmentType $type): void
     {
         $this->assertActiveFor('remove adjustments from');
@@ -249,11 +321,17 @@ class Cart
         }
     }
 
+    /**
+     * Updates the cart modification timestamp after a state-changing operation.
+     */
     public function touch(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
     }
 
+    /**
+     * Executes the assertActiveFor behavior owned by this Carting runtime responsibility.
+     */
     private function assertActiveFor(string $operation): void
     {
         if (CartStatus::Active === $this->status) {

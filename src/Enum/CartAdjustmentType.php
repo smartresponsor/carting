@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Carting\Enum;
 
+/**
+ * Defines the CartAdjustmentType responsibility used by the Carting component runtime.
+ */
 enum CartAdjustmentType: string
 {
     case PriceEstimate = 'price_estimate';
