@@ -1,0 +1,15 @@
+doctrine:
+  dbal:
+    default_connection: data
+    connections:
+      data:
+        driver: pdo_pgsql
+        url: '%env(resolve:DATABASE_URL)%'
+  orm:
+    mappings:
+      Carting:
+        is_bundle: false
+        type: attribute
+        dir: '%kernel.project_dir%/src/Entity'
+        prefix: 'App\Carting\Entity'
+        alias: Carting

@@ -10,4 +10,6 @@ composer.phar
 phpunit.xml
 phpstan.neon
 /.php-cs-fixer.cache
+.DS_Store
+Thumbs.db
 
