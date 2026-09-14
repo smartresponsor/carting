@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
 #[ORM\Table(name: 'cart_cart')]
+#[ORM\UniqueConstraint(name: 'uniq_cart_cart_token', columns: ['cart_token'])]
 #[ORM\Index(columns: ['cart_token'], name: 'cart_cart_token_idx')]
 #[ORM\Index(columns: ['owner_reference'], name: 'cart_cart_owner_reference_idx')]
 /**
@@ -28,7 +29,7 @@ class Cart implements ObjectAuditedInterface
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'cart_token', type: 'string', length: 96, unique: true)]
+    #[ORM\Column(name: 'cart_token', type: 'string', length: 96)]
     private string $cartToken;
 
     #[ORM\Column(name: 'owner_reference', type: 'string', length: 191, nullable: true)]

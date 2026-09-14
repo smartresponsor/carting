@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: 'cart_item')]
 #[ORM\Index(columns: ['offer_reference'], name: 'cart_item_offer_reference_idx')]
+#[ORM\Index(columns: ['cart_id'], name: 'idx_cart_item_cart_id')]
 /**
  * Defines the CartItem responsibility used by the Carting component runtime.
  */

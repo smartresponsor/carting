@@ -31,7 +31,10 @@ final class CartDoctrineMetadataTest extends TestCase
 
         self::assertSame('cart_cart', $metadata->getTableName());
         self::assertSame(96, $metadata->getFieldMapping('cartToken')->length);
-        self::assertTrue($metadata->getFieldMapping('cartToken')->unique ?? false);
+        self::assertSame(
+            ['cart_token'],
+            $metadata->table['uniqueConstraints']['uniq_cart_cart_token']['columns'] ?? null,
+        );
         self::assertSame(191, $metadata->getFieldMapping('ownerReference')->length);
         self::assertTrue($metadata->getFieldMapping('ownerReference')->nullable ?? false);
         self::assertSame(3, $metadata->getFieldMapping('currencyCode')->length);

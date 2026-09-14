@@ -15,7 +15,7 @@
 - Branch: `canon/carting-structure-runtime-20260910-publish`.
 - Baseline worktree was not clean before this run: untracked `.gating/` already existed and is treated as pre-existing local tooling, not product source for this change.
 - `composer qa` passes: 45 tests / 162 assertions, PHPStan clean, PHP-CS-Fixer clean.
-- `schema:parity` is currently blocked before mapping validation because `DATABASE_URL` is absent in the test environment.
+- Baseline `schema:parity` was blocked before mapping validation because standalone Carting did not bootstrap any test `DATABASE_URL`; this run materialized a bounded isolated PostgreSQL parity lifecycle and closed the blocker.
 - Carting is a standalone Symfony component/application (`bin/console` + `config/bundles.php`) and therefore Canon022 applies.
 
 ### Canon mapping and selected RC-critical work
@@ -62,9 +62,10 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 - `composer qa`: PASS — 51 tests / 197 assertions, PHP-CS-Fixer clean, PHPStan clean across `src`, `tests`, and `migrations`.
 - Changed PHP lint: PASS, including `migrations/Version20260914082000.php`.
 - `composer audit`: PASS — no security vulnerability advisories.
-- `composer schema:parity`: BLOCKED before Doctrine mapping/database verification because `DATABASE_URL` is not defined in the test environment. No database URL or credentials were invented or persisted.
+- `composer schema:parity`: PASS against a clean disposable PostgreSQL `carting_test` database: database drop/create, complete migration chain, Doctrine mapping validation, schema synchronization, and migration-currentness all pass. Host credentials are reused only at runtime; no database secret is copied or persisted in Carting.
 - Local Gating copy was read as executable-policy evidence; direct `gating` execution is not an allowlisted repository check in the current Console MCP execution surface, so canonical hard rules were verified through their textual rules, Composer validation, regression tests, and available gates.
 
 ### Residual RC condition
 
-- The only unresolved runtime gate is Canon030 full Doctrine schema parity against an isolated PostgreSQL test database. Supply/configure `DATABASE_URL` for the test environment and rerun `composer schema:parity`; all other currently available RC checks pass.
+- None in the current Carting RC scope. Canon030 now reproduces current Doctrine metadata from the full migration chain on the isolated disposable `carting_test` database, and `schema:diff` is empty.
+- `config/reference.php` is Symfony-generated local reference output and is explicitly ignored; it is not product source.
