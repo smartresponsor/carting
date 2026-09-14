@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Carting\Entity;
 
+use App\Objecting\EntityInterface\ObjectAuditedInterface;
+use App\Objecting\EntityTrait\Embeddable\ObjectAuditEmbeddableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -13,8 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Defines the CartCheckoutHandoffEntity responsibility used by the Carting component runtime.
  */
-class CartCheckoutHandoffEntity
+class CartCheckoutHandoffEntity implements ObjectAuditedInterface
 {
+    use ObjectAuditEmbeddableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -37,9 +40,6 @@ class CartCheckoutHandoffEntity
     #[ORM\Column(name: 'accepted_at', type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $acceptedAt = null;
 
-    #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
-
     /**
      * Initializes the dependencies and state required by this Carting runtime responsibility.
      * @param array<string, mixed> $payload
@@ -54,7 +54,7 @@ class CartCheckoutHandoffEntity
         $this->cart = $cart;
         $this->handoffReference = $handoffReference;
         $this->payload = $payload;
-        $this->createdAt = new \DateTimeImmutable();
+        $this->initializeObjectAudit();
     }
 
     /**
@@ -100,13 +100,6 @@ class CartCheckoutHandoffEntity
     {
         return $this->acceptedAt;
     }
-    /**
-     * Returns the value produced by getCreatedAt for this Carting runtime responsibility.
-     */
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
 
     /**
      * Executes the markAccepted behavior owned by this Carting runtime responsibility.
@@ -123,8 +116,10 @@ class CartCheckoutHandoffEntity
         }
 
         if (null === $this->downstreamReference) {
+            $acceptedAt = new \DateTimeImmutable();
             $this->downstreamReference = $downstreamReference;
-            $this->acceptedAt = new \DateTimeImmutable();
+            $this->acceptedAt = $acceptedAt;
+            $this->touchModified($acceptedAt);
         }
     }
 }

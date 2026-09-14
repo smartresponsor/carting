@@ -3,6 +3,7 @@ parameters:
   paths:
     - src
     - tests
+    - migrations
   ignoreErrors:
     -
       identifier: property.unusedType

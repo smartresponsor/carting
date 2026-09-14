@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Carting\Entity;
 
 use App\Carting\Enum\CartStatus;
+use App\Objecting\EntityInterface\ObjectAuditedInterface;
+use App\Objecting\EntityTrait\Embeddable\ObjectAuditEmbeddableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -13,8 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Defines the CartItem responsibility used by the Carting component runtime.
  */
-class CartItem
+class CartItem implements ObjectAuditedInterface
 {
+    use ObjectAuditEmbeddableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -42,12 +45,6 @@ class CartItem
     /** @var array<string, mixed> */
     #[ORM\Column(name: 'metadata', type: 'json')]
     private array $metadata = [];
-
-    #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
-
-    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable')]
-    private \DateTimeImmutable $updatedAt;
 
     /**
      * Initializes the dependencies and state required by this Carting runtime responsibility.
@@ -85,8 +82,7 @@ class CartItem
         $this->currencyCode = $currencyCode;
         $this->quantity = $quantity;
         $this->metadata = $metadata;
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = $this->createdAt;
+        $this->initializeObjectAudit();
     }
 
     /**
@@ -146,13 +142,6 @@ class CartItem
     {
         return $this->metadata;
     }
-    /**
-     * Returns the value produced by getUpdatedAt for this Carting runtime responsibility.
-     */
-    public function getUpdatedAt(): \DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
 
     /**
      * Executes the attachToCart behavior owned by this Carting runtime responsibility.
@@ -207,7 +196,7 @@ class CartItem
      */
     private function touch(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->touchModified();
     }
 
     /**

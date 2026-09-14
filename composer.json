@@ -9,30 +9,60 @@
     {
       "type": "path",
       "url": "../Interfacing",
-      "options": { "symlink": true }
+      "options": {
+        "symlink": true,
+        "versions": { "interfacing/interface": "dev-master" }
+      }
     },
     {
       "type": "path",
       "url": "../Cruding",
-      "options": { "symlink": true }
+      "options": {
+        "symlink": true,
+        "versions": { "cruding/crud": "dev-master" }
+      }
     },
     {
       "type": "path",
       "url": "../Viewing",
-      "options": { "symlink": true }
+      "options": {
+        "symlink": true,
+        "versions": { "viewing/view": "dev-master" }
+      }
     },
     {
       "type": "path",
       "url": "../Objecting",
-      "options": { "symlink": true }
+      "options": {
+        "symlink": true,
+        "versions": { "objecting/object": "dev-master" }
+      }
+    },
+    {
+      "type": "path",
+      "url": "../Collectioning",
+      "options": {
+        "symlink": true,
+        "versions": { "collectioning/collection": "dev-master" }
+      }
+    },
+    {
+      "type": "path",
+      "url": "../Tabling",
+      "options": {
+        "symlink": true,
+        "versions": { "tabling/table": "dev-master" }
+      }
     }
   ],
   "require": {
     "php": "^8.4",
-    "cruding/crud": "*@dev",
-    "viewing/view": "*@dev",
-    "interfacing/interface": "*@dev",
-    "objecting/object": "*@dev",
+    "cruding/crud": "dev-master",
+    "collectioning/collection": "dev-master",
+    "tabling/table": "dev-master",
+    "viewing/view": "dev-master",
+    "interfacing/interface": "dev-master",
+    "objecting/object": "dev-master",
     "easycorp/easyadmin-bundle": "^5.0",
     "symfony/framework-bundle": "^8.1",
     "symfony/console": "^8.1",
@@ -63,8 +93,9 @@
   },
   "scripts": {
     "test": "@php vendor/bin/phpunit",
-    "stan": "@php vendor/bin/phpstan analyse src tests --no-progress",
+    "stan": "@php vendor/bin/phpstan analyse src tests migrations --no-progress",
     "analyse": "@stan",
+    "validate:prod": "composer validate --strict --no-check-all composer.prod.json",
     "lint": "@php -l src/CartingBundle.php",
     "cs:check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff",
     "cs:fix": "@php vendor/bin/php-cs-fixer fix",

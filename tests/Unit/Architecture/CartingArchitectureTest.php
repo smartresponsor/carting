@@ -47,6 +47,50 @@ final class CartingArchitectureTest extends TestCase
         }
     }
 
+    public function testDevelopmentComposerUsesCanonicalPlatformDependencyContour(): void
+    {
+        $composer = file_get_contents($this->root() . '/composer.json');
+        self::assertIsString($composer);
+
+        foreach (['cruding/crud', 'collectioning/collection', 'tabling/table', 'viewing/view', 'interfacing/interface', 'objecting/object'] as $package) {
+            self::assertStringContainsString(sprintf('"%s": "dev-master"', $package), $composer);
+            self::assertStringContainsString(sprintf('"versions": { "%s": "dev-master" }', $package), $composer);
+        }
+    }
+
+    public function testProductionComposerUsesPackagedPlatformDependencies(): void
+    {
+        $composer = file_get_contents($this->root() . '/composer.prod.json');
+        self::assertIsString($composer);
+
+        self::assertStringNotContainsString('"type": "path"', $composer);
+        foreach (['cruding/crud', 'collectioning/collection', 'tabling/table', 'viewing/view', 'interfacing/interface', 'objecting/object'] as $package) {
+            self::assertStringContainsString(sprintf('"%s": "dev-master"', $package), $composer);
+        }
+    }
+
+    public function testDoctrineMapsObjectingEmbeddablesUsedByCartingEntities(): void
+    {
+        $doctrine = file_get_contents($this->root() . '/config/packages/doctrine.yaml');
+        self::assertIsString($doctrine);
+
+        self::assertStringContainsString("vendor/objecting/object/src/Embeddable", $doctrine);
+        self::assertStringContainsString("prefix: 'App\\Objecting\\Embeddable'", $doctrine);
+    }
+
+    public function testAuditTransitionMigrationCoversCurrentCartLifecycle(): void
+    {
+        $migration = file_get_contents($this->root() . '/migrations/Version20260914082000.php');
+        self::assertIsString($migration);
+
+        self::assertStringContainsString('modified_at = updated_at', $migration);
+        self::assertStringContainsString('DROP COLUMN IF EXISTS updated_at', $migration);
+        self::assertStringContainsString("'checkout_pending'", $migration);
+        self::assertStringContainsString("'merged'", $migration);
+        self::assertStringContainsString('downstream_reference', $migration);
+        self::assertStringContainsString('accepted_at', $migration);
+    }
+
     /** @return list<\SplFileInfo> */
     private function phpFiles(string $directory): array
     {
