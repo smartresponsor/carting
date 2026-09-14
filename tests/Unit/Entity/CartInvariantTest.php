@@ -59,6 +59,26 @@ final class CartInvariantTest extends TestCase
         self::assertSame('abandoned', $abandoned->getStatus()->value);
     }
 
+    public function testCartUsesObjectingAuditLifecycle(): void
+    {
+        $cart = new Cart('audit-cart', 'USD');
+
+        self::assertNull($cart->getModifiedAt());
+        $cart->assignOwner('vendor-1');
+        self::assertNotNull($cart->getModifiedAt());
+    }
+
+    public function testCartItemUsesObjectingAuditLifecycle(): void
+    {
+        $cart = new Cart('audit-item', 'USD');
+        $item = new CartItem('offer', 'Offer', 100, 'USD', 1);
+        $cart->addItem($item);
+
+        self::assertNull($item->getModifiedAt());
+        $item->changeQuantity(2);
+        self::assertNotNull($item->getModifiedAt());
+    }
+
     /** @return iterable<string, array{string}> */
     public static function invalidCurrencyProvider(): iterable
     {

@@ -25,11 +25,23 @@
       "type": "vcs",
       "url": "git@github.com:smartresponsor/objecting.git",
       "no-api": true
+    },
+    {
+      "type": "vcs",
+      "url": "git@github.com:smartresponsor/collectioning.git",
+      "no-api": true
+    },
+    {
+      "type": "vcs",
+      "url": "git@github.com:smartresponsor/tabling-.git",
+      "no-api": true
     }
   ],
   "require": {
     "php": "^8.4",
     "cruding/crud": "dev-master",
+    "collectioning/collection": "dev-master",
+    "tabling/table": "dev-master",
     "viewing/view": "dev-master",
     "interfacing/interface": "dev-master",
     "objecting/object": "dev-master",
@@ -63,7 +75,7 @@
   },
   "scripts": {
     "test": "@php vendor/bin/phpunit",
-    "stan": "@php vendor/bin/phpstan analyse src tests --no-progress",
+    "stan": "@php vendor/bin/phpstan analyse src tests migrations --no-progress",
     "analyse": "@stan",
     "lint": "@php -l src/CartingBundle.php",
     "cs:check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff",
