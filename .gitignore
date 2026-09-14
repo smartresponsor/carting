@@ -3,6 +3,7 @@
 /.phpunit.result.cache
 /.codebase-memory/
 /.gating/
+/config/reference.php
 /.idea/
 /.vscode/
 /.env.local

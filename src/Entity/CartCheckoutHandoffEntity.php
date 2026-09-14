@@ -11,7 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity]
 #[ORM\Table(name: 'cart_checkout_handoff')]
 #[ORM\UniqueConstraint(name: 'cart_checkout_handoff_cart_unique', columns: ['cart_id'])]
+#[ORM\UniqueConstraint(name: 'uniq_cart_checkout_handoff_reference', columns: ['handoff_reference'])]
 #[ORM\Index(columns: ['handoff_reference'], name: 'cart_checkout_handoff_reference_idx')]
+#[ORM\Index(columns: ['downstream_reference'], name: 'idx_cart_checkout_handoff_downstream_reference')]
 /**
  * Defines the CartCheckoutHandoffEntity responsibility used by the Carting component runtime.
  */
@@ -27,7 +29,7 @@ class CartCheckoutHandoffEntity implements ObjectAuditedInterface
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private Cart $cart;
 
-    #[ORM\Column(name: 'handoff_reference', type: 'string', length: 96, unique: true)]
+    #[ORM\Column(name: 'handoff_reference', type: 'string', length: 96)]
     private string $handoffReference;
 
     /** @var array<string, mixed> */

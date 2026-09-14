@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0fa327363e09accd9ee3f679b43f5ce4",
+    "content-hash": "64d1965d2967e1167e12913cd8cbc396",
     "packages": [
         {
             "name": "collectioning/collection",
@@ -12,7 +12,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Collectioning",
-                "reference": "9fc56c8626ae5d2dd751cbf45fa28c8869095a7f"
+                "reference": "4aaf4248e328488baa9f0654d32e96db7edacee4"
             },
             "require": {
                 "doctrine/doctrine-bundle": "^3.2",
@@ -156,10 +156,10 @@
             "dist": {
                 "type": "path",
                 "url": "../Cruding",
-                "reference": "a923a054a923441a3be99201ac5fee51eb68b661"
+                "reference": "46cfe44c3f0e8a9f7284c89742556c96400dec5f"
             },
             "require": {
-                "collectioning/collection": "dev-main || dev-master",
+                "collectioning/collection": "dev-master",
                 "doctrine/doctrine-bundle": "^3.2",
                 "doctrine/orm": "^3.0",
                 "php": "^8.4",
@@ -175,7 +175,7 @@
                 "symfony/twig-bundle": "^8.1",
                 "symfony/validator": "^8.1",
                 "symfony/yaml": "^8.1",
-                "tabling/table": "dev-backend-table-actions || dev-backend-table-metadata || dev-initial-platform-primitive || dev-main || dev-master"
+                "tabling/table": "dev-master"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.95",
@@ -1503,9 +1503,13 @@
                 "reference": "02c5ccf77ad1986f2187e8d91f8a422e86af0d97"
             },
             "require": {
+                "collectioning/collection": "dev-master",
                 "composer-runtime-api": "^2.2",
+                "cruding/crud": "dev-master",
+                "easycorp/easyadmin-bundle": "^5.5.1",
                 "ext-ctype": "*",
                 "ext-iconv": "*",
+                "objecting/object": "dev-master",
                 "php": "^8.4",
                 "symfony/asset": "8.1.*",
                 "symfony/asset-mapper": "8.1.*",
@@ -1521,7 +1525,9 @@
                 "symfony/uid": "^8.1",
                 "symfony/validator": "8.1.*",
                 "symfony/yaml": "8.1.*",
-                "twig/twig": "^3.27.1"
+                "tabling/table": "dev-master",
+                "twig/twig": "^3.27.1",
+                "viewing/view": "dev-master"
             },
             "replace": {
                 "symfony/polyfill-ctype": "*",
@@ -1534,7 +1540,9 @@
                 "phpstan/phpstan": "^2.2.2",
                 "phpstan/phpstan-phpunit": "^2.0.16",
                 "phpstan/phpstan-symfony": "^2.0.19",
-                "phpunit/phpunit": "^11.5.55"
+                "phpunit/phpunit": "^11.5.55",
+                "symfony/panther": "^2.4",
+                "symfony/test-pack": "^1.2"
             },
             "type": "library",
             "extra": {
@@ -1554,6 +1562,9 @@
                 }
             },
             "scripts": {
+                "validate:prod": [
+                    "composer validate --strict --no-check-all composer.prod.json"
+                ],
                 "lint": [
                     "php tools/qa/php-lint.php"
                 ],
@@ -1580,6 +1591,10 @@
                 ],
                 "test": [
                     "phpunit"
+                ],
+                "test:coverage": [
+                    "@php -r \"if (!is_dir('var/coverage')) { mkdir('var/coverage', 0777, true); }\"",
+                    "@php -d xdebug.mode=coverage vendor/bin/phpunit --path-coverage --coverage-text=var/coverage/summary.txt"
                 ],
                 "test:unit": [
                     "phpunit --testsuite unit"
@@ -1629,7 +1644,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Objecting",
-                "reference": "a0433d1921c132732709ba3306d181a80debadad"
+                "reference": "fe87beb7f62af2f5b83e910c47ac8e2b0f1db99f"
             },
             "require": {
                 "doctrine/orm": "^3.3",
@@ -7180,10 +7195,10 @@
             "dist": {
                 "type": "path",
                 "url": "../Tabling",
-                "reference": "bc26adf0a9f7a2dbe88b7929ec44338493f47ce4"
+                "reference": "1003099da7cf6c6bac3becb7c09f0fdd5c90ed9c"
             },
             "require": {
-                "collectioning/collection": "dev-main || dev-master",
+                "collectioning/collection": "dev-master",
                 "php": "^8.4",
                 "symfony/dependency-injection": "^8.1",
                 "symfony/framework-bundle": "^8.1",
@@ -7210,14 +7225,28 @@
                 "test": [
                     "phpunit tests"
                 ],
+                "test:coverage": [
+                    "@php -r \"if (!is_dir('var/coverage')) { mkdir('var/coverage', 0777, true); }\"",
+                    "@php -d xdebug.mode=coverage vendor/bin/phpunit --branch-coverage --coverage-text=var/coverage/summary.txt"
+                ],
+                "validate:prod": [
+                    "composer validate --strict --no-check-all composer.prod.json"
+                ],
                 "phpstan": [
-                    "phpstan analyse src tests --level=8"
+                    "phpstan analyse -c phpstan.neon"
                 ],
                 "cs:check": [
                     "php-cs-fixer fix --dry-run --diff"
                 ],
                 "cs:fix": [
                     "php-cs-fixer fix"
+                ],
+                "quality": [
+                    "@test",
+                    "@test:coverage",
+                    "@phpstan",
+                    "@cs:check",
+                    "@validate:prod"
                 ]
             },
             "license": [

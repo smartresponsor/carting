@@ -79,6 +79,7 @@
   "require-dev": {
     "phpunit/phpunit": "^12.0",
     "phpstan/phpstan": "^2.0",
+    "symfony/dotenv": "^8.1",
     "friendsofphp/php-cs-fixer": "^3.0"
   },
   "autoload": {
@@ -99,8 +100,15 @@
     "lint": "@php -l src/CartingBundle.php",
     "cs:check": "@php vendor/bin/php-cs-fixer fix --dry-run --diff",
     "cs:fix": "@php vendor/bin/php-cs-fixer fix",
+    "schema:test:reset": [
+      "@php bin/console doctrine:database:drop --env=test --force --if-exists",
+      "@php bin/console doctrine:database:create --env=test --if-not-exists",
+      "@php bin/console doctrine:migrations:migrate --env=test --no-interaction"
+    ],
     "schema:validate": "@php bin/console doctrine:schema:validate --env=test",
+    "schema:diff": "@php bin/console doctrine:schema:update --env=test --dump-sql",
     "schema:parity": [
+      "@schema:test:reset",
       "@schema:validate",
       "@php bin/console doctrine:migrations:up-to-date --env=test"
     ],
