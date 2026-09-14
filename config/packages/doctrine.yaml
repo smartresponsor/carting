@@ -4,7 +4,10 @@ doctrine:
     connections:
       data:
         driver: pdo_pgsql
+        server_version: '16'
         url: '%env(resolve:DATABASE_URL)%'
+        mapping_types:
+          ltree: string
   orm:
     mappings:
       Carting:
@@ -13,3 +16,9 @@ doctrine:
         dir: '%kernel.project_dir%/src/Entity'
         prefix: 'App\Carting\Entity'
         alias: Carting
+      ObjectingEmbeddable:
+        is_bundle: false
+        type: attribute
+        dir: '%kernel.project_dir%/vendor/objecting/object/src/Embeddable'
+        prefix: 'App\Objecting\Embeddable'
+        alias: Objecting

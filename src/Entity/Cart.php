@@ -7,25 +7,29 @@ namespace App\Carting\Entity;
 use App\Carting\Enum\CartAdjustmentType;
 use App\Carting\Enum\CartStatus;
 use App\Carting\Repository\CartRepository;
+use App\Objecting\EntityInterface\ObjectAuditedInterface;
+use App\Objecting\EntityTrait\Embeddable\ObjectAuditEmbeddableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
 #[ORM\Table(name: 'cart_cart')]
+#[ORM\UniqueConstraint(name: 'uniq_cart_cart_token', columns: ['cart_token'])]
 #[ORM\Index(columns: ['cart_token'], name: 'cart_cart_token_idx')]
 #[ORM\Index(columns: ['owner_reference'], name: 'cart_cart_owner_reference_idx')]
 /**
  * Defines the Cart responsibility used by the Carting component runtime.
  */
-class Cart
+class Cart implements ObjectAuditedInterface
 {
+    use ObjectAuditEmbeddableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'cart_token', type: 'string', length: 96, unique: true)]
+    #[ORM\Column(name: 'cart_token', type: 'string', length: 96)]
     private string $cartToken;
 
     #[ORM\Column(name: 'owner_reference', type: 'string', length: 191, nullable: true)]
@@ -44,12 +48,6 @@ class Cart
     /** @var Collection<int, CartAdjustmentEntity> */
     #[ORM\OneToMany(mappedBy: 'cart', targetEntity: CartAdjustmentEntity::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $adjustments;
-
-    #[ORM\Column(name: 'created_at', type: 'datetime_immutable')]
-    private \DateTimeImmutable $createdAt;
-
-    #[ORM\Column(name: 'updated_at', type: 'datetime_immutable')]
-    private \DateTimeImmutable $updatedAt;
 
     #[ORM\Column(name: 'expires_at', type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $expiresAt = null;
@@ -84,8 +82,7 @@ class Cart
         $this->ownerReference = $ownerReference;
         $this->items = new ArrayCollection();
         $this->adjustments = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = $this->createdAt;
+        $this->initializeObjectAudit();
     }
 
     /**
@@ -122,20 +119,6 @@ class Cart
     public function getStatus(): CartStatus
     {
         return $this->status;
-    }
-    /**
-     * Returns the value produced by getCreatedAt for this Carting runtime responsibility.
-     */
-    public function getCreatedAt(): \DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-    /**
-     * Returns the value produced by getUpdatedAt for this Carting runtime responsibility.
-     */
-    public function getUpdatedAt(): \DateTimeImmutable
-    {
-        return $this->updatedAt;
     }
     /**
      * Returns the value produced by getExpiresAt for this Carting runtime responsibility.
@@ -250,7 +233,7 @@ class Cart
     {
         $this->assertActiveFor('change expiration for');
 
-        if (null !== $expiresAt && $expiresAt < $this->createdAt) {
+        if (null !== $expiresAt && $expiresAt < $this->getCreatedAt()) {
             throw new \InvalidArgumentException('Cart expiration timestamp cannot precede creation timestamp.');
         }
 
@@ -326,7 +309,7 @@ class Cart
      */
     public function touch(): void
     {
-        $this->updatedAt = new \DateTimeImmutable();
+        $this->touchModified();
     }
 
     /**
