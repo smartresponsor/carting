@@ -44,7 +44,7 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 
 - Objecting's current version embeddable does not carry Doctrine `#[ORM\\Version]`; Cart keeps its existing Doctrine optimistic-lock field rather than weakening concurrency safety.
 - Objecting audit embeddables require an explicit Doctrine mapping in Carting standalone runtime; `config/packages/doctrine.yaml` now maps the packaged Objecting embeddable path.
-- Pre-existing untracked `.gating/` remains outside this change and must not be staged accidentally.
+- Pre-existing local `.gating/` mirror is treated as local tooling state; `/.gating/` is now ignored so it remains outside source history and no longer blocks integration.
 
 ### Implemented RC hardening
 
