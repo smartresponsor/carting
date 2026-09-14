@@ -2,6 +2,7 @@
 /var/
 /.phpunit.result.cache
 /.codebase-memory/
+/.gating/
 /.idea/
 /.vscode/
 /.env.local
