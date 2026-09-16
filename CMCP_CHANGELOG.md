@@ -70,6 +70,23 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 - None in the current Carting RC scope. Canon030 now reproduces current Doctrine metadata from the full migration chain on the isolated disposable `carting_test` database, and `schema:diff` is empty.
 - `config/reference.php` is Symfony-generated local reference output and is explicitly ignored; it is not product source.
 
+## 2026-09-16 — Canon030 clean-chain revalidation
+
+### Reconnaissance and canon mapping
+- Re-read Carting `AGENTS.md`, `README.md`, Composer manifest, responsibility/output/checkout-readiness architecture documents, current entities and migration chain, plus required Objecting, Cruding, Viewing, Interfacing, Gating, and Canonization root contracts.
+- Consulted Canon000, Canon001, Canon002, Canon003, Canon007, Canon008, Canon018, Canon019, Canon020, Canon021, Canon022, Canon023, Canon024, Canon025, Canon026, Canon029, Canon030, Canon032, Canon033, Canon034, Canon036, Canon038, Canon039, Canon041, Canon043, Canon044, and Canon045 where applicable.
+- RC-critical workstream: preserve mutable-cart and checkout-handoff boundaries while restoring exact migration/ORM schema parity. Growth remains richer cart diagnostics, mutation idempotency ergonomics, buyer-context enrichment, and handoff observability; inventory, pricing authority, payment, shipping, committed orders, tax, and promotion remain outside Carting.
+
+### Factual baseline and verification
+- `composer validate --strict`: PASS.
+- `composer qa`: PASS, 51 tests / 197 assertions, PHP-CS-Fixer clean, PHPStan clean.
+- Initial clean `schema:parity` reproduced a Canon030 defect: Doctrine requested renaming `idx_e99308e41ad5cdbf` to `idx_cart_adjustment_cart_id` and `idx_f0fe25271ad5cdbf` to `idx_cart_item_cart_id`.
+- During this run, `migrations/Version20260916182500.php` changed concurrently from an ALTER-based repair to a DROP-hash/CREATE-canonical-index repair and appeared as an untracked file. This run did not overwrite or claim authorship of that concurrent change.
+- Re-running `schema:parity` against the updated current worktree passed completely: clean database recreation, six migrations, Doctrine mapping and schema synchronization, and migration currentness all green.
+
+### Worktree boundary
+- The concurrent untracked migration is required by the currently passing schema chain but remains external/concurrent work from this run's perspective; it must not be silently staged as this run's authored change without integration ownership being clear.
+
 ## 2026-09-16 — Canon030 repair and current testing-canon uplift
 
 ### Reconnaissance and canon mapping
