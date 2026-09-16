@@ -69,3 +69,46 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 
 - None in the current Carting RC scope. Canon030 now reproduces current Doctrine metadata from the full migration chain on the isolated disposable `carting_test` database, and `schema:diff` is empty.
 - `config/reference.php` is Symfony-generated local reference output and is explicitly ignored; it is not product source.
+
+## 2026-09-16 — Canon030 repair and current testing-canon uplift
+
+### Reconnaissance and canon mapping
+
+- Re-read the Carting repository documentation, market analysis, Composer manifests, Symfony/Doctrine configuration, current entities, migration chain, tests, scripts, and release-hardening notes on branch `rc/carting-schema-parity-20260914`.
+- Re-read the required Objecting, Cruding, Viewing, and Interfacing contracts and confirmed the Carting boundary remains mutable cart intent plus checkout handoff; generic CRUD, presentation rendering, shell ownership, Objecting system-field semantics, tax engines, promotion engines, payment, fulfillment, and committed-order ownership remain outside Carting.
+- Consulted Canonization normative rules Canon018, Canon019, Canon021, Canon022, Canon023, Canon024, Canon026, Canon029, Canon030, Canon039, Canon040, Canon041, Canon042, Canon043, Canon044, and Canon045, plus the guard matrix/rules journal; Gating was read as the executable companion.
+- Market check reconfirmed the boundary against current Shopify Storefront Cart and Medusa Cart/Promotion/Tax module documentation: cart state and checkout handoff are distinct from downstream purchase completion and specialized tax/promotion engines.
+
+### Factual baseline and selected RC-critical work
+
+- Initial worktree was clean at `ac557cef5dd58e3a8237bd2970f0b014a2a50054`, one commit ahead of upstream.
+- `composer qa` passed at baseline with 51 tests / 197 assertions, PHPStan clean, and PHP-CS-Fixer clean.
+- Contrary to the prior journal entry, a fresh `composer schema:parity` failed after replaying the complete migration chain: Doctrine reported schema drift. The exact diff required restoration of two unique indexes and canonical names for two cart relation indexes.
+- Canon039/041 had become relevant hard tooling requirements after the earlier hardening wave: the repository lacked an explicit PHPUnit source coverage population, persistent branch/path coverage script, Symfony Test Pack/Panther dependencies, and repository-local Playwright tooling.
+
+### Implemented RC work
+
+- Added forward migration `Version20260916182500` without rewriting historical migrations. It restores the two metadata-required unique indexes and deterministically recreates the CartItem/CartAdjustment relation indexes under the names declared by current Doctrine metadata.
+- Added PHPUnit `src/` coverage population and `test:coverage`, using Xdebug path coverage and persistent `var/coverage/summary.txt` evidence.
+- Added Symfony Test Pack and Panther development dependencies and synchronized `composer.lock`.
+- Added repository-local Playwright tooling (`package.json`, `package-lock.json`, `playwright.config.js`) and an executable runner smoke that does not fabricate application UI behavior.
+- Extended `.gitignore` for `node_modules/`, Playwright test results, and Playwright reports.
+
+### Verification
+
+- `composer schema:parity`: PASS from a clean disposable PostgreSQL database; 6 migrations replayed, mapping valid, schema synchronized, migrations current.
+- `composer schema:diff`: PASS / empty after the repair.
+- `composer qa`: PASS — 51 tests / 197 assertions; CS and PHPStan clean.
+- `composer validate --strict --check-lock`: PASS.
+- `validate:prod`: PASS.
+- `composer audit`: PASS, no advisories.
+- `npm test`: PASS — Playwright runner smoke 1/1.
+- `npm audit --audit-level=high`: PASS, zero vulnerabilities.
+- `composer test:coverage`: PASS and produced canonical evidence: Lines 78.97% (443/561), Methods 56.56% (69/122), Branches 74.28% (257/346). Canon040 branch target is satisfied; line and method targets remain warning-level remediation debt, not a hard Canon040 failure.
+- Canon042 behavioral/UI coverage percentages are not invented: no schema-v2 denominator/evidence producer is claimed by this wave, so that remains measurable post-RC evidence debt rather than fabricated compliance.
+
+### Growth / post-RC workstream
+
+- Raise Canon040 line coverage from 78.97% to at least 80% and method coverage from 56.56% to at least 80% with behaviorally meaningful tests, prioritizing `CartMutationService`, `CartController`, entity lifecycle/accessor surfaces, and checkout services.
+- Add a repository-owned Canon042 evidence producer only after stable functional/workflow/UI eligible inventories are explicitly defined; keep test counts out of the denominator.
+- Continue richer buyer-context, cart diagnostics, batch mutation, and UX/API maturity only after RC correctness and evidence contracts remain stable.
