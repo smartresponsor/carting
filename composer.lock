@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "49077b7775a51b11c7d434fc4f45700f",
+    "content-hash": "8d32ceecd6a943d54542ed5c50f5d30f",
     "packages": [
         {
             "name": "collectioning/collection",
@@ -12,7 +12,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Collectioning",
-                "reference": "d02e608c700dc4c7487d55f9d5f4c7f432b7c086"
+                "reference": "a10b546a7a293e15a8bcacfb36d3795212f4d3e1"
             },
             "require": {
                 "doctrine/doctrine-bundle": "^3.2",
@@ -226,10 +226,8 @@
                     "@php tools/smoke/cruding-config-declarative-only-smoke.php",
                     "@php tools/smoke/cruding-config-driven-operation-token-router-smoke.php",
                     "@php tools/smoke/cruding-direct-entity-fqcn-canon-smoke.php",
-                    "@php tools/smoke/cruding-dto-suffix-smoke.php",
                     "@php tools/smoke/cruding-phpdoc-coverage-smoke.php",
                     "@php tools/smoke/cruding-service-layout-smoke.php",
-                    "@php tools/smoke/cruding-service-role-suffix-smoke.php",
                     "@php tools/smoke/cruding-entrypoint-contract-finalization-smoke.php",
                     "@php tools/smoke/cruding-entrypoint-migration-contract-smoke.php",
                     "@php tools/smoke/cruding-entrypoint-operation-method-parity-smoke.php",
@@ -1386,16 +1384,16 @@
         },
         {
             "name": "easycorp/easyadmin-bundle",
-            "version": "v5.5.1",
+            "version": "v5.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/EasyCorp/EasyAdminBundle.git",
-                "reference": "77b2a6b13c7050cd5412b3ce2b86e909682b97c3"
+                "reference": "e02a2b6b38630e53b40a6342b6efbe34b8dda3e3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/77b2a6b13c7050cd5412b3ce2b86e909682b97c3",
-                "reference": "77b2a6b13c7050cd5412b3ce2b86e909682b97c3",
+                "url": "https://api.github.com/repos/EasyCorp/EasyAdminBundle/zipball/e02a2b6b38630e53b40a6342b6efbe34b8dda3e3",
+                "reference": "e02a2b6b38630e53b40a6342b6efbe34b8dda3e3",
                 "shasum": ""
             },
             "require": {
@@ -1484,7 +1482,7 @@
             ],
             "support": {
                 "issues": "https://github.com/EasyCorp/EasyAdminBundle/issues",
-                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v5.5.1"
+                "source": "https://github.com/EasyCorp/EasyAdminBundle/tree/v5.6.0"
             },
             "funding": [
                 {
@@ -1492,7 +1490,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-08-11T06:28:56+00:00"
+            "time": "2026-09-17T19:03:00+00:00"
         },
         {
             "name": "interfacing/interface",
@@ -7196,7 +7194,7 @@
             "dist": {
                 "type": "path",
                 "url": "../Tabling",
-                "reference": "e9a680d14f80d579b41a0fd8f60ab8b67dbf7de0"
+                "reference": "7b9be0a8127b1f3d976062873c9ad4582a7f5e55"
             },
             "require": {
                 "collectioning/collection": "dev-master",
@@ -8046,6 +8044,84 @@
                 }
             ],
             "time": "2026-07-10T09:23:21+00:00"
+        },
+        {
+            "name": "gating/gate",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "../Gating",
+                "reference": "a71a2189bddfefad1b69a9e067be0299c52b080c"
+            },
+            "require": {
+                "php": "^8.4",
+                "symfony/console": "^8.1",
+                "symfony/filesystem": "^8.1",
+                "symfony/finder": "^8.1",
+                "symfony/yaml": "^8.1"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.95.4",
+                "phpstan/phpstan": "^2.2.2",
+                "phpunit/phpunit": "^13.3.3",
+                "rector/rector": "^2.4.1"
+            },
+            "bin": [
+                "bin/gating"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Gating\\Gate\\": "src/"
+                }
+            },
+            "scripts": {
+                "gate": [
+                    "@php bin/gating check --target=."
+                ],
+                "scan": [
+                    "@php bin/gating scan --target=."
+                ],
+                "test": [
+                    "@php tests/calibration.php"
+                ],
+                "test:unit": [
+                    "phpunit tests/Unit"
+                ],
+                "test:coverage": [
+                    "@php -d xdebug.mode=coverage vendor/bin/phpunit --branch-coverage --coverage-text=var/coverage/summary.txt"
+                ],
+                "cs:check": [
+                    "php-cs-fixer fix --dry-run --diff --verbose"
+                ],
+                "cs:fix": [
+                    "php-cs-fixer fix --verbose"
+                ],
+                "phpstan": [
+                    "phpstan analyse -c .gating/quality/owner/php/phpstan.neon"
+                ],
+                "rector:check": [
+                    "rector process --dry-run --config .gating/quality/owner/php/rector.php"
+                ],
+                "rector:fix": [
+                    "rector process --config .gating/quality/owner/php/rector.php"
+                ],
+                "quality": [
+                    "@cs:check",
+                    "@phpstan",
+                    "@rector:check",
+                    "@test",
+                    "@gate"
+                ]
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Smart Responsor Symfony-oriented executable ecosystem gate.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "myclabs/deep-copy",
@@ -10984,6 +11060,7 @@
     "stability-flags": {
         "collectioning/collection": 20,
         "cruding/crud": 20,
+        "gating/gate": 20,
         "interfacing/interface": 20,
         "objecting/object": 20,
         "tabling/table": 20,

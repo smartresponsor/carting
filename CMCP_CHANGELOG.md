@@ -129,3 +129,25 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 - Raise Canon040 line coverage from 78.97% to at least 80% and method coverage from 56.56% to at least 80% with behaviorally meaningful tests, prioritizing `CartMutationService`, `CartController`, entity lifecycle/accessor surfaces, and checkout services.
 - Add a repository-owned Canon042 evidence producer only after stable functional/workflow/UI eligible inventories are explicitly defined; keep test counts out of the denominator.
 - Continue richer buyer-context, cart diagnostics, batch mutation, and UX/API maturity only after RC correctness and evidence contracts remain stable.
+
+## 2026-09-17 — Executable Gating integration and RC revalidation
+
+### Reconnaissance and market boundary
+- Started from a clean `rc/carting-schema-parity-20260914` worktree synchronized with its upstream and re-read Carting guidance, README, development/production Composer manifests, current coverage evidence, and the existing execution journal.
+- Reused the required Objecting, Cruding, Viewing, Interfacing, Gating, and Canonization contour already established for Carting and mapped this pass to Canon029, Canon030, Canon039, Canon040, Canon041, Canon042, Canon043, Canon044, and Canon045.
+- Current Shopify/Medusa cart practice continues to support Carting's boundary: buyer/cart context and mutable cart state belong with the cart, while tax and promotion engines remain distinct modules and payment/order fulfillment remain downstream.
+
+### Material implementation
+- Added development-only `gating/gate` through a canonical local path repository with `symlink: true` and exact `dev-master` version pin.
+- Added repository-owned `config/cart_gating_profile.yaml` and `config/cart_gating_rules.yaml` and an executable `gating:check` Composer script using the installed Gating policy rather than a copied runtime tree.
+- Updated the Composer lock through a package-scoped Gating update; Composer also refreshed the compatible local Collectioning/Tabling references and EasyAdmin within existing constraints.
+
+### Verification and residual debt
+- `composer validate --strict --check-lock`: PASS.
+- `validate:prod`: PASS.
+- `cs:check`: PASS, 0 fixable files.
+- PHPUnit: PASS, 51 tests / 197 assertions.
+- PHPStan: PASS, 0 errors across `src`, `tests`, and `migrations`.
+- `schema:parity`: PASS from a clean disposable PostgreSQL `carting_test` database; 6 migrations / 71 SQL queries, mapping valid, schema synchronized, migrations current.
+- `gating:check`: PASS with 36 rules, 0 failures, 2 warnings, 3 skipped. Canon040 reports lines 78.97%, methods 56.56%, branches 74.28%; Canon042 reports missing behavioral/UI coverage inventory.
+- Canon040/042 remain explicit non-blocking evidence debt. No synthetic getter-test wave or fabricated behavioral/UI denominator was added merely to silence warnings.
