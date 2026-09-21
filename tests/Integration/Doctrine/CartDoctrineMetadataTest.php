@@ -67,6 +67,8 @@ final class CartDoctrineMetadataTest extends TestCase
         self::assertSame('adjustments', $metadata->getAssociationMapping('cart')->inversedBy ?? null);
         self::assertSame(32, $metadata->getFieldMapping('type')->length);
         self::assertSame(191, $metadata->getFieldMapping('label')->length);
+        self::assertSame(191, $metadata->getFieldMapping('sourceReference')->length);
+        self::assertTrue($metadata->getFieldMapping('sourceReference')->nullable ?? false);
     }
 
     public function testCheckoutHandoffHasOnePerCartUniqueConstraint(): void

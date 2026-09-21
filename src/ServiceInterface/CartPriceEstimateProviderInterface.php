@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\ServiceInterface;
 
+use App\Carting\DTO\CartPriceEstimateDTO;
 use App\Carting\Entity\Cart;
 
 /**
@@ -14,5 +15,5 @@ interface CartPriceEstimateProviderInterface
     /**
      * Executes the estimateTotalMinor behavior owned by this Carting runtime responsibility.
      */
-    public function estimateTotalMinor(Cart $cart): int;
+    public function estimate(Cart $cart): CartPriceEstimateDTO;
 }

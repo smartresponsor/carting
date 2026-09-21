@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Carting\Service;
 
 use App\Carting\Entity\Cart;
+use App\Carting\DTO\CartAdjustmentViewDTO;
 use App\Carting\DTO\CartItemViewDTO;
 use App\Carting\DTO\CartSummaryDTO;
 
@@ -37,8 +38,15 @@ final class CartSummaryService
         }
 
         $adjustmentTotalMinor = 0;
+        $adjustments = [];
         foreach ($cart->getAdjustments() as $adjustment) {
             $adjustmentTotalMinor += $adjustment->getAmountMinor();
+            $adjustments[] = new CartAdjustmentViewDTO(
+                $adjustment->getType(),
+                $adjustment->getLabel(),
+                $adjustment->getAmountMinor(),
+                $adjustment->getSourceReference(),
+            );
         }
 
         return new CartSummaryDTO(
@@ -49,6 +57,7 @@ final class CartSummaryService
             $adjustmentTotalMinor,
             $subtotalMinor + $adjustmentTotalMinor,
             $items,
+            $adjustments,
         );
     }
 }

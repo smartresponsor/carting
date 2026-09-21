@@ -11,7 +11,9 @@
       "url": "../Interfacing",
       "options": {
         "symlink": true,
-        "versions": { "interfacing/interface": "dev-master" }
+        "versions": {
+          "interfacing/interface": "dev-master"
+        }
       }
     },
     {
@@ -19,7 +21,9 @@
       "url": "../Cruding",
       "options": {
         "symlink": true,
-        "versions": { "cruding/crud": "dev-master" }
+        "versions": {
+          "cruding/crud": "dev-master"
+        }
       }
     },
     {
@@ -27,7 +31,9 @@
       "url": "../Viewing",
       "options": {
         "symlink": true,
-        "versions": { "viewing/view": "dev-master" }
+        "versions": {
+          "viewing/view": "dev-master"
+        }
       }
     },
     {
@@ -35,7 +41,9 @@
       "url": "../Objecting",
       "options": {
         "symlink": true,
-        "versions": { "objecting/object": "dev-master" }
+        "versions": {
+          "objecting/object": "dev-master"
+        }
       }
     },
     {
@@ -43,7 +51,9 @@
       "url": "../Collectioning",
       "options": {
         "symlink": true,
-        "versions": { "collectioning/collection": "dev-master" }
+        "versions": {
+          "collectioning/collection": "dev-master"
+        }
       }
     },
     {
@@ -51,7 +61,9 @@
       "url": "../Tabling",
       "options": {
         "symlink": true,
-        "versions": { "tabling/table": "dev-master" }
+        "versions": {
+          "tabling/table": "dev-master"
+        }
       }
     },
     {
@@ -59,7 +71,9 @@
       "url": "../Gating",
       "options": {
         "symlink": true,
-        "versions": { "gating/gate": "dev-master" }
+        "versions": {
+          "gating/gate": "dev-master"
+        }
       }
     }
   ],
@@ -132,6 +146,13 @@
       "@cs:check",
       "@test",
       "@stan"
+    ],
+    "gate": "@php vendor/bin/gating check --target=.",
+    "quality": [
+      "@cs:check",
+      "@stan",
+      "@test",
+      "@gate"
     ]
   },
   "extra": {

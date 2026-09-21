@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Unit\Service;
 
+use App\Carting\DTO\CartAvailabilityResultDTO;
 use App\Carting\Entity\Cart;
 use App\Carting\Entity\CartItem;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
@@ -26,11 +27,11 @@ final class CartMutationServiceTest extends TestCase
         $availability = new class implements CartAvailabilityCheckerInterface {
             public int $checkedQuantity = 0;
 
-            public function isAvailable(string $offerReference, int $quantity): bool
+            public function checkAvailability(string $offerReference, int $quantity): CartAvailabilityResultDTO
             {
                 $this->checkedQuantity = $quantity;
 
-                return false;
+                return new CartAvailabilityResultDTO(false, 2, 'stocking-test');
             }
         };
 

@@ -13,6 +13,54 @@ use PHPUnit\Framework\TestCase;
 
 final class CartMergeServiceTest extends TestCase
 {
+    public function testRecoverReturnsExistingOwnerCartWithoutGuest(): void
+    {
+        $owner = new Cart('owner', 'USD', 'owner-1');
+        $repository = $this->createMock(CartRepositoryInterface::class);
+        $repository->expects(self::once())->method('findActiveByOwnerReference')->with('owner-1')->willReturn($owner);
+        $repository->expects(self::never())->method('save');
+
+        $result = (new CartMergeService($repository, new CartLifecycleGuardService()))
+            ->recoverOwnerCart('owner-1');
+
+        self::assertSame($owner, $result);
+    }
+
+    public function testRecoverClaimsGuestWhenOwnerHasNoActiveCart(): void
+    {
+        $guest = new Cart('guest', 'USD');
+        $repository = $this->createMock(CartRepositoryInterface::class);
+        $repository->expects(self::once())->method('findActiveByOwnerReference')->with('owner-1')->willReturn(null);
+        $repository->expects(self::once())->method('save')->with($guest);
+
+        $result = (new CartMergeService($repository, new CartLifecycleGuardService()))
+            ->recoverOwnerCart('owner-1', $guest);
+
+        self::assertSame($guest, $result);
+        self::assertSame('owner-1', $guest->getOwnerReference());
+    }
+
+    public function testClaimGuestCartAssignsOwnerAndPersists(): void
+    {
+        $guest = new Cart('guest', 'USD');
+        $repository = $this->createMock(CartRepositoryInterface::class);
+        $repository->expects(self::once())->method('save')->with($guest);
+
+        $result = (new CartMergeService($repository, new CartLifecycleGuardService()))
+            ->claimGuestCart($guest, 'owner-1');
+
+        self::assertSame($guest, $result);
+        self::assertSame('owner-1', $guest->getOwnerReference());
+    }
+
+    public function testClaimGuestCartRejectsAlreadyOwnedCart(): void
+    {
+        $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
+
+        $this->expectException(\LogicException::class);
+        $service->claimGuestCart(new Cart('owned', 'USD', 'owner-1'), 'owner-2');
+    }
+
     public function testMergeCopiesGuestItemAndMarksGuestCartMerged(): void
     {
         $guest = new Cart('guest', 'USD');
@@ -31,15 +79,16 @@ final class CartMergeServiceTest extends TestCase
         self::assertNotSame($guestItem, $ownerItem);
         self::assertSame($guest, $guestItem->getCart());
         self::assertSame($owner, $ownerItem->getCart());
+        self::assertSame('owner-1', $owner->getOwnerReference());
         self::assertSame('merged', $guest->getStatus()->value);
     }
 
-    public function testMergeCombinesMatchingOfferQuantity(): void
+    public function testMergeCombinesMatchingCommercialSnapshotQuantity(): void
     {
         $guest = new Cart('guest', 'USD');
-        $owner = new Cart('owner', 'USD');
-        $guest->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 2));
-        $owner->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 3));
+        $owner = new Cart('owner', 'USD', 'owner-1');
+        $guest->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 2, ['revision' => 'same']));
+        $owner->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 3, ['revision' => 'same']));
 
         $repository = $this->createStub(CartRepositoryInterface::class);
         $repository->method('save');
@@ -49,6 +98,31 @@ final class CartMergeServiceTest extends TestCase
 
         self::assertCount(1, $result->getItems());
         self::assertSame(5, $result->getItems()->first()->getQuantity());
+    }
+
+    public function testMergePreservesConflictingSnapshotsAsSeparateOwnerLines(): void
+    {
+        $guest = new Cart('guest', 'USD');
+        $owner = new Cart('owner', 'USD', 'owner-1');
+        $guest->addItem(new CartItem('offer-1', 'Offer 1', 900, 'USD', 2, ['priceRevision' => 'guest']));
+        $owner->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 3, ['priceRevision' => 'owner']));
+
+        $repository = $this->createStub(CartRepositoryInterface::class);
+        $repository->method('save');
+
+        $result = (new CartMergeService($repository, new CartLifecycleGuardService()))
+            ->mergeGuestCartIntoOwnerCart($guest, $owner);
+
+        self::assertCount(2, $result->getItems());
+        self::assertSame([1000, 900], array_map(
+            static fn(CartItem $item): int => $item->getUnitPriceMinor(),
+            $result->getItems()->toArray(),
+        ));
+        self::assertSame([3, 2], array_map(
+            static fn(CartItem $item): int => $item->getQuantity(),
+            $result->getItems()->toArray(),
+        ));
+        self::assertSame('merged', $guest->getStatus()->value);
     }
 
     public function testMergeRejectsSameCart(): void
@@ -65,7 +139,26 @@ final class CartMergeServiceTest extends TestCase
         $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
 
         $this->expectException(\LogicException::class);
-        $service->mergeGuestCartIntoOwnerCart(new Cart('guest', 'USD'), new Cart('owner', 'EUR'));
+        $service->mergeGuestCartIntoOwnerCart(new Cart('guest', 'USD'), new Cart('owner', 'EUR', 'owner-1'));
+    }
+
+    public function testMergeRejectsOwnedSourceCart(): void
+    {
+        $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
+
+        $this->expectException(\LogicException::class);
+        $service->mergeGuestCartIntoOwnerCart(
+            new Cart('guest', 'USD', 'owner-1'),
+            new Cart('owner', 'USD', 'owner-2'),
+        );
+    }
+
+    public function testMergeRejectsGuestTargetCart(): void
+    {
+        $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
+
+        $this->expectException(\LogicException::class);
+        $service->mergeGuestCartIntoOwnerCart(new Cart('guest', 'USD'), new Cart('owner', 'USD'));
     }
 
     public function testMergeRejectsConvertedGuestCart(): void
@@ -76,6 +169,6 @@ final class CartMergeServiceTest extends TestCase
         $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
 
         $this->expectException(\LogicException::class);
-        $service->mergeGuestCartIntoOwnerCart($guest, new Cart('owner', 'USD'));
+        $service->mergeGuestCartIntoOwnerCart($guest, new Cart('owner', 'USD', 'owner-1'));
     }
 }

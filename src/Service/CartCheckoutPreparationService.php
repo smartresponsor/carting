@@ -6,6 +6,8 @@ namespace App\Carting\Service;
 
 use App\Carting\Entity\Cart;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
+use App\Carting\Enum\CartStatus;
+use App\Carting\DTO\CartAdjustmentViewDTO;
 use App\Carting\DTO\CartCheckoutPayloadDTO;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -29,6 +31,18 @@ final class CartCheckoutPreparationService
      */
     public function prepare(Cart $cart): CartCheckoutHandoffEntity
     {
+        if (CartStatus::CheckoutPending === $cart->getStatus()) {
+            $existingHandoff = $this->entityManager
+                ->getRepository(CartCheckoutHandoffEntity::class)
+                ->findOneBy(['cart' => $cart]);
+
+            if ($existingHandoff instanceof CartCheckoutHandoffEntity) {
+                return $existingHandoff;
+            }
+
+            throw new \LogicException('Checkout-pending cart has no persisted handoff.');
+        }
+
         $readiness = $this->readinessService->inspect($cart);
 
         if (!$readiness->ready) {
@@ -59,6 +73,7 @@ final class CartCheckoutPreparationService
             $summary->subtotalMinor,
             $summary->totalMinor,
             $lines,
+            array_map(static fn(CartAdjustmentViewDTO $adjustment): array => $adjustment->toArray(), $summary->adjustments),
         );
 
         $handoff = new CartCheckoutHandoffEntity($cart, bin2hex(random_bytes(24)), $payload->toArray());

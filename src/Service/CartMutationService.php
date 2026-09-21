@@ -60,7 +60,7 @@ final class CartMutationService
 
         $resultingQuantity = $quantity + ($existingItem?->getQuantity() ?? 0);
 
-        if ($this->availabilityChecker && !$this->availabilityChecker->isAvailable($offerReference, $resultingQuantity)) {
+        if ($this->availabilityChecker && !$this->availabilityChecker->checkAvailability($offerReference, $resultingQuantity)->available) {
             return new CartMutationResultDTO(false, 'Offer is not available in the requested quantity.', $this->summaryService->summarize($cart));
         }
 

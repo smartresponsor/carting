@@ -10,8 +10,8 @@ namespace App\Carting\DTO;
 final readonly class CartSummaryDTO
 {
     /**
-     * Initializes the dependencies and state required by this Carting runtime responsibility.
      * @param list<CartItemViewDTO> $items
+     * @param list<CartAdjustmentViewDTO> $adjustments
      */
     public function __construct(
         public string $cartToken,
@@ -21,11 +21,11 @@ final readonly class CartSummaryDTO
         public int $adjustmentTotalMinor,
         public int $totalMinor,
         public array $items,
+        public array $adjustments = [],
     ) {}
 
     /**
-     * Returns the value produced by toArray for this Carting runtime responsibility.
-     * @return array{cartToken:string,currencyCode:string,itemCount:int,subtotalMinor:int,adjustmentTotalMinor:int,totalMinor:int,items:list<array{id:int,offerReference:string,title:string,quantity:int,unitPriceMinor:int,lineTotalMinor:int}>}
+     * @return array{cartToken:string,currencyCode:string,itemCount:int,subtotalMinor:int,adjustmentTotalMinor:int,totalMinor:int,items:list<array{id:int,offerReference:string,title:string,quantity:int,unitPriceMinor:int,lineTotalMinor:int}>,adjustments:list<array{type:string,label:string,amountMinor:int,sourceReference:?string}>}
      */
     public function toArray(): array
     {
@@ -37,6 +37,7 @@ final readonly class CartSummaryDTO
             'adjustmentTotalMinor' => $this->adjustmentTotalMinor,
             'totalMinor' => $this->totalMinor,
             'items' => array_map(static fn(CartItemViewDTO $item): array => $item->toArray(), $this->items),
+            'adjustments' => array_map(static fn(CartAdjustmentViewDTO $adjustment): array => $adjustment->toArray(), $this->adjustments),
         ];
     }
 }

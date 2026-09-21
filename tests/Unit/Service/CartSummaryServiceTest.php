@@ -29,12 +29,14 @@ final class CartSummaryServiceTest extends TestCase
     {
         $cart = new Cart('token', 'USD');
         $cart->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 2));
-        $cart->addAdjustment(new CartAdjustmentEntity($cart, CartAdjustmentType::Promotion, 'Promotion', -500));
-        $cart->addAdjustment(new CartAdjustmentEntity($cart, CartAdjustmentType::TaxEstimate, 'Tax estimate', 160));
+        $cart->addAdjustment(new CartAdjustmentEntity($cart, CartAdjustmentType::Promotion, 'Promotion', -500, 'promotion-1'));
+        $cart->addAdjustment(new CartAdjustmentEntity($cart, CartAdjustmentType::TaxEstimate, 'Tax estimate', 160, 'tax-1'));
 
         $summary = (new CartSummaryService())->summarize($cart);
 
         self::assertSame(-340, $summary->adjustmentTotalMinor);
         self::assertSame(1660, $summary->totalMinor);
+        self::assertSame('promotion-1', $summary->adjustments[0]->sourceReference);
+        self::assertSame('tax-1', $summary->adjustments[1]->sourceReference);
     }
 }

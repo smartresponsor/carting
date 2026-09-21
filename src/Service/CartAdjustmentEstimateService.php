@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
+use App\Carting\DTO\CartAdjustmentEstimateDTO;
 use App\Carting\Entity\Cart;
 use App\Carting\Entity\CartAdjustmentEntity;
 use App\Carting\Enum\CartAdjustmentType;
@@ -32,18 +33,15 @@ final class CartAdjustmentEstimateService
     {
         if ($this->priceEstimateProvider instanceof CartPriceEstimateProviderInterface) {
             $cart->removeAdjustmentsOfType(CartAdjustmentType::PriceEstimate);
-            $estimatedTotalMinor = $this->priceEstimateProvider->estimateTotalMinor($cart);
-            if ($estimatedTotalMinor < 0) {
-                throw new \UnexpectedValueException('Price estimate provider returned a negative total.');
-            }
-
-            $deltaMinor = $estimatedTotalMinor - $this->itemSubtotalMinor($cart);
+            $estimate = $this->priceEstimateProvider->estimate($cart);
+            $deltaMinor = $estimate->totalMinor - $this->itemSubtotalMinor($cart);
             if (0 !== $deltaMinor) {
                 $cart->addAdjustment(new CartAdjustmentEntity(
                     $cart,
                     CartAdjustmentType::PriceEstimate,
                     'Price estimate',
                     $deltaMinor,
+                    $estimate->sourceReference,
                 ));
             }
         }
@@ -64,21 +62,15 @@ final class CartAdjustmentEstimateService
     }
 
     /**
-     * Executes the addEstimate behavior owned by this Carting runtime responsibility.
-     * @param array{label:string,amountMinor:int} $estimate
+     * Materializes one typed external adjustment fact into Carting persistence.
      */
-    private function addEstimate(Cart $cart, CartAdjustmentType $type, array $estimate): void
+    private function addEstimate(Cart $cart, CartAdjustmentType $type, CartAdjustmentEstimateDTO $estimate): void
     {
-        $label = trim($estimate['label']);
-        if ('' === $label) {
-            throw new \UnexpectedValueException('Cart estimate provider returned an empty adjustment label.');
-        }
-
-        if (0 === $estimate['amountMinor']) {
+        if (0 === $estimate->amountMinor) {
             return;
         }
 
-        $cart->addAdjustment(new CartAdjustmentEntity($cart, $type, $label, $estimate['amountMinor']));
+        $cart->addAdjustment(new CartAdjustmentEntity($cart, $type, $estimate->label, $estimate->amountMinor, $estimate->sourceReference));
     }
 
     /**

@@ -33,20 +33,29 @@ class CartAdjustmentEntity
     #[ORM\Column(name: 'amount_minor', type: 'integer')]
     private int $amountMinor;
 
+    #[ORM\Column(name: 'source_reference', type: 'string', length: 191, nullable: true)]
+    private ?string $sourceReference = null;
+
     /**
      * Initializes the dependencies and state required by this Carting runtime responsibility.
      */
-    public function __construct(Cart $cart, CartAdjustmentType $type, string $label, int $amountMinor)
+    public function __construct(Cart $cart, CartAdjustmentType $type, string $label, int $amountMinor, ?string $sourceReference = null)
     {
         $label = trim($label);
         if ('' === $label) {
             throw new \InvalidArgumentException('Cart adjustment label must not be empty.');
         }
 
+        $sourceReference = null === $sourceReference ? null : trim($sourceReference);
+        if ('' === $sourceReference) {
+            throw new \InvalidArgumentException('Cart adjustment source reference must not be empty when provided.');
+        }
+
         $this->cart = $cart;
         $this->type = $type;
         $this->label = $label;
         $this->amountMinor = $amountMinor;
+        $this->sourceReference = $sourceReference;
     }
 
     /**
@@ -83,5 +92,10 @@ class CartAdjustmentEntity
     public function getType(): CartAdjustmentType
     {
         return $this->type;
+    }
+
+    public function getSourceReference(): ?string
+    {
+        return $this->sourceReference;
     }
 }

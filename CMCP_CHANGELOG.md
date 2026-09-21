@@ -151,3 +151,108 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 - `schema:parity`: PASS from a clean disposable PostgreSQL `carting_test` database; 6 migrations / 71 SQL queries, mapping valid, schema synchronized, migrations current.
 - `gating:check`: PASS with 36 rules, 0 failures, 2 warnings, 3 skipped. Canon040 reports lines 78.97%, methods 56.56%, branches 74.28%; Canon042 reports missing behavioral/UI coverage inventory.
 - Canon040/042 remain explicit non-blocking evidence debt. No synthetic getter-test wave or fabricated behavioral/UI denominator was added merely to silence warnings.
+
+## 2026-09-20 — Product capability roadmap execution baseline
+
+### Reconnaissance read
+
+- Re-read Carting `AGENTS.md`, `README.md`, development/production Composer manifests, live `PRODUCT_CAPABILITY_AUDIT.adoc`, architecture documents, RC milestone notes, current Cart/CartItem entities, merge/mutation services, repository contracts, controller wiring, tests, Gating profile/rules, and the existing CMCP journal.
+- Re-read the required Objecting, Cruding, Viewing, Interfacing, Gating, and Canonization contour. Canonization remains READ_ONLY; relevant normative rules consulted for this pass include Canon000, Canon003, Canon012, Canon013, Canon017, Canon018, Canon019, Canon021, and Canon044, with the guard matrix used only as enforcement metadata.
+- Market/peer baseline rechecked against current Shopify Storefront Cart and Medusa cart/checkout behavior: line mutation and mutable-cart state remain cart responsibilities, while order commitment and specialized pricing/promotion/tax/stock engines stay outside Carting.
+
+### Current repository state
+
+- Branch: `rc/carting-schema-parity-20260914`.
+- Baseline worktree has one pre-existing untracked authoritative roadmap file: `PRODUCT_CAPABILITY_AUDIT.adoc`. This execution does not treat its untracked status as permission to omit or overwrite its current content.
+- Live roadmap is newer than prior RC journal claims and currently marks buyer/guest identity, cart merge conflict semantics, typed producer results, and saved/recoverable carts as incomplete.
+
+### Target-to-canon mapping
+
+- Canon000/018: `carting/cart` maps to `App\\Carting\\` with `Cart*` subject vocabulary.
+- Canon003/012: stable merge/mutation outcomes and cross-component facts must use explicit typed contracts rather than long-lived unshaped arrays.
+- Canon013: no placeholder merge or idempotency behavior may be used to make the roadmap appear complete.
+- Canon017: roadmap/architecture documentation must be updated to match proven runtime behavior.
+- Canon019: no Domain/Application/Infrastructure or Port/Adapter/Adaptor root taxonomy may be introduced.
+- Canon021: Carting keeps only cart-owned business operations; generic CRUD remains in Cruding.
+- Canon044/Objecting: existing entity-native audit fields remain consumed through Objecting packs; this milestone does not clone system fields locally.
+
+### Selected RC-critical workstream
+
+- Implement the earliest incomplete roadmap milestone: make guest-to-owner merge identity requirements explicit and deterministic, preserve conflicting commercial snapshots as separate owner lines instead of silently summing unlike snapshots, and prove both successful reassociation and conflict behavior in tests.
+- Preserve the Carting/Ordering boundary and leave Pricing, Promoting, Taxating, Stocking, payment, shipping, and committed-order ownership outside this milestone.
+
+### Growth workstream (non-blocking)
+
+- Typed producer-result integration, saved/recoverable cart lifecycle, richer recovery diagnostics, and end-to-end Ordering acceptance remain subsequent roadmap work after the merge/identity invariant is green.
+
+### Material risks and gates
+
+- Risk: combining lines solely by offer reference can silently alter commercial intent when guest and owner snapshots differ in price/title/metadata.
+- Risk: a method named guest-to-owner merge currently accepts carts whose owner identities contradict those roles.
+- Verification gates planned: Composer validation, PHP lint, PHPUnit/coverage, PHPStan, PHP-CS-Fixer, Gating, Symfony container/YAML checks, Doctrine/schema parity when applicable, plus repository-specific tests.
+
+### Material implementation completed
+
+- Milestone 1: added explicit guest-cart claiming, enforced guest/owner roles during merge, and changed merge coalescing from offer-reference-only to full commercial-snapshot equality so conflicting price/title/currency/metadata snapshots are preserved as separate lines.
+- Milestone 2: replaced scalar/array producer-result seams with Carting-owned typed DTO facts for pricing, promotion, tax, and stock availability. Added optional producer source references and persisted them on cart adjustments.
+- Checkout replay provenance: cart summaries now expose typed adjustment projections and checkout handoffs freeze adjustment type, label, amount, and source reference. Historical persisted handoff payloads without an adjustments key remain readable.
+- Milestone 3: added explicit recovery of the active persisted owner cart without reactivating abandoned/expired terminal carts.
+- Retry safety present in the current worktree: checkout preparation reuses the persisted handoff for a checkout-pending cart; accepted completion reuses the downstream reference and does not call the consumer twice. These checkout-idempotency edits appeared concurrently during this execution and were preserved, reviewed, and verified rather than overwritten.
+- Milestone 4 boundary check: current Ordering tree exposes no explicit CartCheckout handoff acceptance contract discoverable by repository search. Carting therefore keeps the host-neutral CartCheckoutHandoffConsumerInterface; a concrete Ordering adapter remains host/integration ownership and is not fabricated here.
+
+### Verification results
+
+- Changed PHP lint: PASS across 27 changed/untracked PHP files before the final documentation-only edits.
+- PHPUnit: PASS — 69 tests / 246 assertions.
+- PHPStan: PASS — 0 errors across src, tests, and migrations.
+- PHP-CS-Fixer: PASS after repository-local formatter application — 0 fixable files.
+- Doctrine schema parity: PASS from a clean disposable PostgreSQL carting_test database; 7 migrations / 72 SQL queries, mapping valid, schema synchronized, migrations current.
+- Production Composer manifest validation: PASS.
+- Test coverage: lines 81.1% (514/634), methods 59.0% (79/134), branches 77.4% (329/425). Canon040 line and branch targets are green; method coverage remains warning-level debt.
+- Gating: PASS with 36 rules, 0 failures, 2 warnings, 3 skipped. Remaining warnings are Canon040 method coverage and Canon042 missing behavioral/UI coverage evidence.
+- No browser/mobile UI behavior changed in this wave; no visual artifact is required for the implementation itself.
+
+### Remaining RC integration condition
+
+- Carting-side product capability milestones are implemented through the handoff boundary. A concrete end-to-end Carting -> Ordering adapter cannot be truthfully implemented inside this repository until Ordering publishes a stable acceptance contract or the host application owns that adapter.
+- Canon042 evidence remains repository-level test-observability debt; no synthetic behavioral/UI denominator was invented.
+
+## 2026-09-21 — Carting RC verification and integration pass
+
+### Reconnaissance and canon mapping
+
+- Re-read Carting AGENTS, README, development/production Composer manifests, Gating profile/rules, current capability audit, checkout-readiness architecture document, current worktree status/diff, and the active RC journal.
+- Re-read the required Objecting, Cruding, Viewing, Interfacing and Gating AGENTS/README/Composer contracts that materially govern Carting, and treated their worktrees as read-only dependencies.
+- Re-read Canonization authoritative textual rules Canon018, Canon019, Canon021, Canon022, Canon023, Canon024, Canon030, Canon040 and Canon044. Mapping: carting/cart => App\\Carting\\ + Cart*; no alternative root taxonomy; generic CRUD remains Cruding-owned; local platform dependencies use symlinked path repositories; production uses packaged dependencies; Doctrine migration chain must equal current metadata; PHP line/method/branch coverage is independently measured; Objecting system fields remain entity-native.
+- Code Memory scope resolution found no declared memory:scope:resolve Composer script, but Console MCP resolved the repo-local Carting graph as the implementation graph and the umbrella www graph as read-only navigation.
+
+### Current state and selected RC work
+
+- Branch rc/carting-schema-parity-20260914 was synchronized with upstream at HEAD 231bcd8059ee9a98219427c5dc572c51f08861d8 before integration and carried the existing product-capability workstream.
+- RC-critical work for this pass was verification/repair of that workstream, not speculative feature growth.
+- External market baseline remained consistent with the component boundary: mutable cart state and checkout handoff belong to Carting; promotion/tax/pricing/inventory engines and committed-order ownership remain separate capabilities.
+- Growth remains non-blocking: richer UX/API diagnostics and Canon042 behavioral/UI evidence should follow after RC integration.
+
+### Repairs made during verification
+
+- Normalized tests/Unit/DTO/CartProducerResultDTOTest.php with the repository PHP-CS-Fixer and made its producer-kind match exhaustive for PHPStan.
+- Replaced formatting-sensitive Composer string assertions in tests/Unit/Architecture/CartingArchitectureTest.php with semantic JSON assertions over direct dev-master requirements and exactly one symlinked path repository per canonical platform dependency.
+
+### Verification
+
+- composer validate --strict --check-lock: PASS.
+- composer qa: PASS — 69 tests / 246 assertions, PHP-CS-Fixer clean, PHPStan clean.
+- composer schema:parity: PASS — clean disposable PostgreSQL database, 7 migrations / 72 SQL queries, mapping valid, schema synchronized, migrations current.
+- composer validate:prod: PASS.
+- composer test:coverage: PASS — Lines 81.07% (514/634), Methods 58.96% (79/134), Branches 77.41% (329/425). Canon040 line/branch targets pass; method coverage remains warning-level debt, not HIGH_TEST_DEBT.
+- composer audit: PASS — no security advisories.
+- Symfony lint:container: PASS; lint:yaml config: PASS for all 8 YAML files.
+- npm test: PASS — Playwright tooling smoke 1/1; npm audit --audit-level=high: PASS with zero vulnerabilities.
+
+### External Gating blocker
+
+- composer gating:check cannot currently start because the live sibling Gating repository is mid canonical namespace/rule migration: its executable source expects App\\Gating\\Console\\GatingApplication while the installed package metadata still exposes Gating\\Gate\\ => src/.
+- The Gating worktree is independently dirty on rc/gating-canon-sync-20260921 with 108 changes. Carting does not patch or commit that repository. This is an external integration blocker for executable Gating only; all independent Carting gates above are green.
+
+
+

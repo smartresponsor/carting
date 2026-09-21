@@ -22,6 +22,42 @@ final class CartMergeService
     ) {}
 
     /**
+     * Recovers the persisted active cart for an authenticated owner and reconciles an optional guest cart.
+     */
+    public function recoverOwnerCart(string $ownerReference, ?Cart $guestCart = null): ?Cart
+    {
+        $ownerReference = trim($ownerReference);
+        if ('' === $ownerReference) {
+            throw new \InvalidArgumentException('Cart owner reference must not be empty.');
+        }
+
+        $ownerCart = $this->cartRepository->findActiveByOwnerReference($ownerReference);
+        if (!$guestCart instanceof Cart) {
+            return $ownerCart;
+        }
+
+        if ($ownerCart instanceof Cart) {
+            return $this->mergeGuestCartIntoOwnerCart($guestCart, $ownerCart);
+        }
+
+        return $this->claimGuestCart($guestCart, $ownerReference);
+    }
+
+    /**
+     * Reassociates an active guest cart with an authenticated owner when no owner cart exists.
+     */
+    public function claimGuestCart(Cart $guestCart, string $ownerReference): Cart
+    {
+        $this->lifecycleGuard->assertActive($guestCart, 'claim');
+        $this->assertGuestCart($guestCart);
+
+        $guestCart->assignOwner($ownerReference);
+        $this->cartRepository->save($guestCart);
+
+        return $guestCart;
+    }
+
+    /**
      * Executes the mergeGuestCartIntoOwnerCart behavior owned by this Carting runtime responsibility.
      */
     public function mergeGuestCartIntoOwnerCart(Cart $guestCart, Cart $ownerCart): Cart
@@ -32,6 +68,11 @@ final class CartMergeService
 
         $this->lifecycleGuard->assertActive($guestCart, 'merge');
         $this->lifecycleGuard->assertActive($ownerCart, 'merge into');
+        $this->assertGuestCart($guestCart);
+
+        if (null === $ownerCart->getOwnerReference()) {
+            throw new \LogicException('Owner cart must have an owner reference before a guest cart can be merged into it.');
+        }
 
         if ($guestCart->getCurrencyCode() !== $ownerCart->getCurrencyCode()) {
             throw new \LogicException('Cannot merge carts with different currencies.');
@@ -40,7 +81,7 @@ final class CartMergeService
         foreach ($guestCart->getItems() as $guestItem) {
             $matched = false;
             foreach ($ownerCart->getItems() as $ownerItem) {
-                if ($ownerItem->getOfferReference() === $guestItem->getOfferReference()) {
+                if ($this->hasSameCommercialSnapshot($guestItem, $ownerItem)) {
                     $ownerItem->increaseBy($guestItem->getQuantity());
                     $matched = true;
                     break;
@@ -65,5 +106,21 @@ final class CartMergeService
         $this->cartRepository->save($guestCart);
 
         return $ownerCart;
+    }
+
+    private function assertGuestCart(Cart $cart): void
+    {
+        if (null !== $cart->getOwnerReference()) {
+            throw new \LogicException('Guest cart must not already have an owner reference.');
+        }
+    }
+
+    private function hasSameCommercialSnapshot(CartItem $left, CartItem $right): bool
+    {
+        return $left->getOfferReference() === $right->getOfferReference()
+            && $left->getTitleSnapshot() === $right->getTitleSnapshot()
+            && $left->getUnitPriceMinor() === $right->getUnitPriceMinor()
+            && $left->getCurrencyCode() === $right->getCurrencyCode()
+            && $left->getMetadata() === $right->getMetadata();
     }
 }

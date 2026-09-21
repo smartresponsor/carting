@@ -10,8 +10,10 @@ This module is **not** responsible for product inventory validation, price catal
 - Cart identity lifecycle management (anonymous vs authenticated).
 - Cart item listing, addition, deletion, and quantity mutation.
 - Captures item price and title snapshots to lock selected item rates.
-- Carts merging (e.g. merging guest carts on login).
-- Prepares checkout handoff payloads, persists them as `checkout_pending`, and leaves final conversion to downstream `Ordering` acceptance.
+- Guest-cart claiming and conflict-safe guest-to-owner cart merging.
+- Active owner-cart recovery without resurrecting abandoned or expired carts.
+- Typed pricing/promotion/tax/availability facts with persisted adjustment provenance.
+- Prepares retry-safe checkout handoff payloads, persists them as `checkout_pending`, and leaves final conversion to downstream `Ordering` acceptance.
 
 ### What this repository does not claim yet
 - Catalog updates or product stock adjustments.

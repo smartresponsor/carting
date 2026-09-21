@@ -46,7 +46,7 @@ final class CartCheckoutReadinessService
                 $messages[] = sprintf('Cart item "%s" currency does not match cart currency.', $item->getOfferReference());
             }
 
-            if ($this->availabilityChecker && !$this->availabilityChecker->isAvailable($item->getOfferReference(), $item->getQuantity())) {
+            if ($this->availabilityChecker && !$this->availabilityChecker->checkAvailability($item->getOfferReference(), $item->getQuantity())->available) {
                 $messages[] = sprintf('Cart item "%s" is not available in the requested quantity.', $item->getOfferReference());
             }
         }

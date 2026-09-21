@@ -37,6 +37,25 @@ final class CartCheckoutHandoffCompletionServiceTest extends TestCase
         self::assertSame('converted', $cart->getStatus()->value);
     }
 
+    public function testCompleteReturnsAcceptedReferenceWithoutCallingConsumerAgain(): void
+    {
+        $cart = new Cart('token', 'USD', 'owner-1');
+        $cart->markCheckoutPending();
+        $handoff = new CartCheckoutHandoffEntity($cart, 'handoff-1', (new CartCheckoutPayloadDTO('token', 'owner-1', 'USD', 1000, 1000, []))->toArray());
+        $handoff->markAccepted('order-123');
+        $cart->markConverted();
+
+        $consumer = $this->createMock(CartCheckoutHandoffConsumerInterface::class);
+        $consumer->expects(self::never())->method('consumeCartCheckoutPayload');
+        $entityManager = $this->createMock(EntityManagerInterface::class);
+        $entityManager->expects(self::never())->method('persist');
+        $entityManager->expects(self::never())->method('flush');
+
+        $reference = (new CartCheckoutHandoffCompletionService($entityManager, $consumer))->complete($handoff);
+
+        self::assertSame('order-123', $reference);
+    }
+
     public function testCompleteFailsClosedWithoutConsumer(): void
     {
         $cart = new Cart('token', 'USD');

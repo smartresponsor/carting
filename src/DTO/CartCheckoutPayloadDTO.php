@@ -10,8 +10,8 @@ namespace App\Carting\DTO;
 final readonly class CartCheckoutPayloadDTO
 {
     /**
-     * Initializes the dependencies and state required by this Carting runtime responsibility.
      * @param list<array{offerReference:string,title:string,quantity:int,unitPriceMinor:int,lineTotalMinor:int}> $lines
+     * @param list<array{type:string,label:string,amountMinor:int,sourceReference:?string}> $adjustments
      */
     public function __construct(
         public string $cartToken,
@@ -20,11 +20,11 @@ final readonly class CartCheckoutPayloadDTO
         public int $subtotalMinor,
         public int $totalMinor,
         public array $lines,
+        public array $adjustments = [],
     ) {}
 
     /**
-     * Executes the fromArray behavior owned by this Carting runtime responsibility.
-     * @param array{cartToken:string,ownerReference:?string,currencyCode:string,subtotalMinor:int,totalMinor:int,lines:list<array{offerReference:string,title:string,quantity:int,unitPriceMinor:int,lineTotalMinor:int}>} $payload
+     * @param array{cartToken:string,ownerReference:?string,currencyCode:string,subtotalMinor:int,totalMinor:int,lines:list<array{offerReference:string,title:string,quantity:int,unitPriceMinor:int,lineTotalMinor:int}>,adjustments?:list<array{type:string,label:string,amountMinor:int,sourceReference:?string}>} $payload
      */
     public static function fromArray(array $payload): self
     {
@@ -35,12 +35,12 @@ final readonly class CartCheckoutPayloadDTO
             $payload['subtotalMinor'],
             $payload['totalMinor'],
             $payload['lines'],
+            $payload['adjustments'] ?? [],
         );
     }
 
     /**
-     * Returns the value produced by toArray for this Carting runtime responsibility.
-     * @return array{cartToken:string,ownerReference:?string,currencyCode:string,subtotalMinor:int,totalMinor:int,lines:list<array{offerReference:string,title:string,quantity:int,unitPriceMinor:int,lineTotalMinor:int}>}
+     * @return array{cartToken:string,ownerReference:?string,currencyCode:string,subtotalMinor:int,totalMinor:int,lines:list<array{offerReference:string,title:string,quantity:int,unitPriceMinor:int,lineTotalMinor:int}>,adjustments:list<array{type:string,label:string,amountMinor:int,sourceReference:?string}>}
      */
     public function toArray(): array
     {
@@ -51,6 +51,7 @@ final readonly class CartCheckoutPayloadDTO
             'subtotalMinor' => $this->subtotalMinor,
             'totalMinor' => $this->totalMinor,
             'lines' => $this->lines,
+            'adjustments' => $this->adjustments,
         ];
     }
 }

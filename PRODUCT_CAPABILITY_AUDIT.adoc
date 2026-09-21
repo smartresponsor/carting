@@ -1,0 +1,38 @@
+= Product Capability Audit: Carting
+:revdate: 2026-09-20
+
+== Boundary verdict
+
+Carting correctly owns mutable commercial intent before purchase commitment. Ordering owns the committed order. Pricing, Promoting, Taxating and Stocking remain producer components whose results are consumed as typed cart adjustments/facts.
+
+== Capability matrix
+
+[cols="3,1,4",options="header"]
+|===
+|Capability |Status |Audit
+|Mutable cart lifecycle |PARITY |Explicit active/expired/checkout_pending/converted rules are documented.
+|Line add/update/remove |PARITY |Core modern-cart responsibility; repository has mature cart workflow surface.
+|Buyer/guest context |PARITY |Active guest carts can be reassociated to an authenticated owner when no owner cart exists; merge rejects owned source carts and guest targets, with explicit regression proof.
+|Cart merge |PARITY |Only identical commercial snapshots are quantity-merged. Conflicting price/title/currency/metadata snapshots for the same offer remain separate owner lines, preserving mutable commercial intent.
+|Price snapshot/reference |PARITY |Carting consumes a typed CartPriceEstimateDTO fact and retains Cart-owned immutable line snapshots; Pricing remains the price-selection owner.
+|Promotion adjustments |PARITY |Carting consumes typed CartAdjustmentEstimateDTO facts; stacking and application truth remain owned by Promoting.
+|Tax adjustments |PARITY |Carting consumes typed CartAdjustmentEstimateDTO facts; tax calculation remains owned by Taxating.
+|Shipping method selection |PARTIAL |Cart may select intent; Shipping owns execution.
+|Inventory availability check |PARITY |Typed CartAvailabilityResultDTO facts are consumed for mutation and checkout readiness; Stocking retains stock ownership.
+|Checkout handoff |PARITY |Persisted handoff preparation reuses an existing pending handoff, and accepted completion reuses the downstream reference without invoking the consumer twice.
+|Saved/recoverable cart |PARITY |Active owner carts are persisted and recovered by owner identity; an optional guest cart is claimed or merged deterministically.
+|Abandonment/recovery facts |PARITY |Abandoned and expired carts remain terminal; recovery means retrieving/reconciling the active owner cart rather than resurrecting terminal state.
+|===
+
+== Boundary risks
+
+* Never turn Carting into a pricing, promotion, tax, stock or order engine.
+* Checkout handoff must be idempotent and immutable enough for Ordering replay.
+
+== Milestone direction
+
+Milestone 1: IMPLEMENTED — line/buyer/guest/merge invariants with explicit guest claim and conflict-safe snapshot merge.
+Milestone 2: IMPLEMENTED — producer results are consumed through typed Carting facts while producer engines remain external.
+Milestone 3: IMPLEMENTED — active owner-cart recovery, terminal abandonment semantics and retry-safe checkout handoff.
+Milestone 4: IMPLEMENTED AT CARTING BOUNDARY — typed checkout payload consumption, downstream acceptance evidence and replay-safe completion are covered; the concrete Ordering adapter remains host integration ownership.
+

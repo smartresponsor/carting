@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Unit\Service;
 
+use App\Carting\DTO\CartAdjustmentEstimateDTO;
+use App\Carting\DTO\CartPriceEstimateDTO;
 use App\Carting\Entity\Cart;
 use App\Carting\Entity\CartAdjustmentEntity;
 use App\Carting\Entity\CartItem;
@@ -26,23 +28,23 @@ final class CartAdjustmentEstimateServiceTest extends TestCase
 
         $service = new CartAdjustmentEstimateService(
             new class implements CartPriceEstimateProviderInterface {
-                public function estimateTotalMinor(Cart $cart): int
+                public function estimate(Cart $cart): CartPriceEstimateDTO
                 {
-                    return 1800;
+                    return new CartPriceEstimateDTO(1800, 'pricing-test');
                 }
             },
             new class implements CartPromotionEstimateProviderInterface {
-                /** @return list<array{label:string,amountMinor:int}> */
+                /** @return list<CartAdjustmentEstimateDTO> */
                 public function estimatePromotions(Cart $cart): array
                 {
-                    return [['label' => 'Promotion', 'amountMinor' => -200]];
+                    return [new CartAdjustmentEstimateDTO('Promotion', -200, 'promoting-test')];
                 }
             },
             new class implements CartTaxEstimateProviderInterface {
-                /** @return list<array{label:string,amountMinor:int}> */
+                /** @return list<CartAdjustmentEstimateDTO> */
                 public function estimateTaxes(Cart $cart): array
                 {
-                    return [['label' => 'Tax estimate', 'amountMinor' => 144]];
+                    return [new CartAdjustmentEstimateDTO('Tax estimate', 144, 'taxating-test')];
                 }
             },
         );
@@ -54,6 +56,13 @@ final class CartAdjustmentEstimateServiceTest extends TestCase
         self::assertCount(4, $cart->getAdjustments());
         self::assertSame(-156, $summary->adjustmentTotalMinor);
         self::assertSame(1844, $summary->totalMinor);
+        self::assertSame(
+            ['pricing-test', 'promoting-test', 'taxating-test'],
+            array_values(array_filter(array_map(
+                static fn(CartAdjustmentEntity $adjustment): ?string => $adjustment->getSourceReference(),
+                $cart->getAdjustments()->toArray(),
+            ))),
+        );
     }
 
     public function testRefreshRejectsNegativePriceEstimate(): void
@@ -61,14 +70,14 @@ final class CartAdjustmentEstimateServiceTest extends TestCase
         $cart = new Cart('token', 'USD');
         $cart->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 1));
         $service = new CartAdjustmentEstimateService(new class implements CartPriceEstimateProviderInterface {
-            public function estimateTotalMinor(Cart $cart): int
+            public function estimate(Cart $cart): CartPriceEstimateDTO
             {
-                return -1;
+                return new CartPriceEstimateDTO(-1);
             }
         });
 
-        $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('negative total');
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('must not be negative');
 
         $service->refresh($cart);
     }

@@ -29,6 +29,15 @@ final class CartCheckoutHandoffCompletionService
     public function complete(CartCheckoutHandoffEntity $handoff): string
     {
         $cart = $handoff->getCart();
+        $acceptedReference = $handoff->getDownstreamReference();
+        if (null !== $acceptedReference) {
+            if (CartStatus::Converted !== $cart->getStatus()) {
+                throw new \LogicException('Accepted checkout handoff must belong to a converted cart.');
+            }
+
+            return $acceptedReference;
+        }
+
         if (CartStatus::CheckoutPending !== $cart->getStatus()) {
             throw new \LogicException('Only a checkout-pending cart can complete a checkout handoff.');
         }

@@ -52,9 +52,20 @@ final class CartingArchitectureTest extends TestCase
         $composer = file_get_contents($this->root() . '/composer.json');
         self::assertIsString($composer);
 
+        /** @var array{require: array<string, string>, repositories: list<array{type?: string, options?: array{symlink?: bool, versions?: array<string, string>}}>} $manifest */
+        $manifest = json_decode($composer, true, 512, JSON_THROW_ON_ERROR);
+
         foreach (['cruding/crud', 'collectioning/collection', 'tabling/table', 'viewing/view', 'interfacing/interface', 'objecting/object'] as $package) {
-            self::assertStringContainsString(sprintf('"%s": "dev-master"', $package), $composer);
-            self::assertStringContainsString(sprintf('"versions": { "%s": "dev-master" }', $package), $composer);
+            self::assertSame('dev-master', $manifest['require'][$package] ?? null);
+
+            $matchingRepositories = array_filter(
+                $manifest['repositories'],
+                static fn(array $repository): bool => 'path' === ($repository['type'] ?? null)
+                    && 'dev-master' === ($repository['options']['versions'][$package] ?? null)
+                    && true === ($repository['options']['symlink'] ?? null),
+            );
+
+            self::assertCount(1, $matchingRepositories, sprintf('Expected one canonical symlinked path repository for %s.', $package));
         }
     }
 
