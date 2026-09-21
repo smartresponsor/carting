@@ -249,10 +249,14 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 - Symfony lint:container: PASS; lint:yaml config: PASS for all 8 YAML files.
 - npm test: PASS — Playwright tooling smoke 1/1; npm audit --audit-level=high: PASS with zero vulnerabilities.
 
-### External Gating blocker
+### Gating refresh and final RC closure
 
-- composer gating:check cannot currently start because the live sibling Gating repository is mid canonical namespace/rule migration: its executable source expects App\\Gating\\Console\\GatingApplication while the installed package metadata still exposes Gating\\Gate\\ => src/.
-- The Gating worktree is independently dirty on rc/gating-canon-sync-20260921 with 108 changes. Carting does not patch or commit that repository. This is an external integration blocker for executable Gating only; all independent Carting gates above are green.
+- Root cause was stale Carting Composer path-package metadata: the live Gating repository had already migrated to App\\Gating\\ and GateApplication, while Carting still resolved the older Gating\\Gate\\ autoload snapshot from its lock/install state.
+- Refreshed only the Carting dependency snapshot with a package-scoped composer update for gating/gate; no Gating repository files were modified.
+- composer gating:check: PASS — 36 rules, 0 failures, 2 warnings, 3 skipped. Remaining warnings are Canon040 method coverage at 58.96% and Canon042 missing behavioral/UI evidence.
+- Re-ran composer qa: PASS — 69 tests / 246 assertions, PHP-CS-Fixer clean, PHPStan clean.
+- Re-ran composer validate --strict --check-lock: PASS.
+- The previous external Gating blocker is resolved for Carting.
 
 
 
