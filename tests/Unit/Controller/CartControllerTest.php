@@ -20,6 +20,7 @@ use App\Carting\Snapshot\CartOfferSnapshot;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class CartControllerTest extends TestCase
@@ -55,6 +56,43 @@ final class CartControllerTest extends TestCase
         self::assertSame('token', $payload['summary']['cartToken']);
         self::assertSame('offer-1', $payload['summary']['items'][0]['offerReference']);
         self::assertSame(2000, $payload['summary']['totalMinor']);
+    }
+
+    public function testMalformedMutationBodyDoesNotCreateCart(): void
+    {
+        $repository = $this->createMock(CartRepositoryInterface::class);
+        $repository->expects(self::never())->method('save');
+        $request = Request::create('/cart/items', 'POST', content: '{broken');
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->createController($repository)->addItem($request);
+    }
+
+    public function testInvalidQuantityDoesNotMutateExistingCart(): void
+    {
+        $repository = $this->createMock(CartRepositoryInterface::class);
+        $repository->expects(self::never())->method('save');
+        $cart = new Cart('token', 'USD');
+        $repository->method('findActiveByToken')->willReturn($cart);
+        $request = Request::create(
+            '/cart/items',
+            'POST',
+            server: ['HTTP_X_CART_TOKEN' => 'token'],
+            content: '{"offerReference":"offer-1","quantity":"2"}',
+        );
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->createController($repository)->addItem($request);
+    }
+
+    public function testPatchRequiresIntegerQuantityBeforeCartLookup(): void
+    {
+        $repository = $this->createMock(CartRepositoryInterface::class);
+        $repository->expects(self::never())->method('findActiveByToken');
+        $request = Request::create('/cart/items/1', 'PATCH', content: '{"quantity":null}');
+
+        $this->expectException(BadRequestHttpException::class);
+        $this->createController($repository)->updateItem($request, 1);
     }
 
     private function createController(CartRepositoryInterface $repository): CartController

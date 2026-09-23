@@ -1,5 +1,18 @@
 # CMCP Execution Journal
 
+## 2026-09-23 — Cart controller request validation baseline
+
+- Read Carting guidance, README, Composer manifests, execution history, Cart controller, mutation service, entity and controller tests; inspected root guidance, README and manifests from Objecting, Cruding, Viewing, Interfacing and Gating, and textual Canonization rules Canon000, Canon001, Canon018, Canon043, Canon044, Canon053.
+- Current branch: `rc/carting-schema-parity-20260914`; pre-existing `.gating/README.md` change is outside this work. Carting owns mutable cart operations and checkout handoff.
+- Canon mapping: `carting/cart` maps to `App\\Carting\\` and `Cart*`; role-first tree and `dev-master` helper dependencies follow Canon001/018/043. The seven linked helpers are permitted by current Canon053 normative text. Cart consumes Objecting audit fields under Canon044. Generic CRUD, rendering and shell remain in Cruding, Viewing and Interfacing.
+- RC-critical selected: reject malformed mutation JSON and invalid input shape before cart persistence or mutation. Risk: missing token currently creates a cart; avoid changing identity semantics without a host contract.
+- Gates planned: focused PHPUnit, Composer validation, PHPStan, PHP-CS-Fixer, Gating and Git status. Growth: buyer context, idempotency, batch changes and diagnostics. Pricing, stock, tax, payment, orders and shipping remain outside Carting.
+- Implementation: validate JSON object shape, non-empty offer reference, and positive integer quantities before cart lookup/creation. Three controller tests cover malformed JSON and invalid quantities without persistence/lookup side effects.
+- Initial gates: Composer strict/check-lock PASS; PHP lint PASS; PHPUnit 72 tests / 252 assertions PASS; PHPStan PASS; PHP-CS-Fixer PASS. Coverage PASS (lines 81.3%, methods 58.5%, branches 77.7%). Profiled `gating:check` PASS with warnings for method coverage and absent behavioral/UI inventory.
+- Full generic `composer gate` FAIL on existing Canon004 entity naming, Canon047 manager dependencies in checkout services, Canon052 copied executable files in `.gating/`, and route-owner scan of relative route attributes. These remain separate RC remediation; pre-existing `.gating/README.md` change is preserved. No claim of full RC clearance.
+
+
+
 ## 2026-09-14 — RC hardening baseline
 
 ### Reconnaissance read

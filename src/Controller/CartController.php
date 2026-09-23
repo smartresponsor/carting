@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -53,9 +54,18 @@ final class CartController
      */
     public function addItem(Request $request): JsonResponse
     {
+        $payload = $this->decodeMutationPayload($request);
+        if (!isset($payload['offerReference']) || !is_string($payload['offerReference']) || '' === trim($payload['offerReference'])) {
+            throw new BadRequestHttpException('offerReference must be a non-empty string.');
+        }
+
+        $quantity = $payload['quantity'] ?? 1;
+        if (!is_int($quantity) || $quantity < 1) {
+            throw new BadRequestHttpException('quantity must be a positive integer.');
+        }
+
         $cart = $this->resolveCart($request);
-        $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $result = $this->mutationService->addItem($cart, (string) $payload['offerReference'], (int) ($payload['quantity'] ?? 1));
+        $result = $this->mutationService->addItem($cart, $payload['offerReference'], $quantity);
 
         return new JsonResponse($result->toArray(), $result->changed ? Response::HTTP_OK : Response::HTTP_UNPROCESSABLE_ENTITY);
     }
@@ -66,9 +76,13 @@ final class CartController
      */
     public function updateItem(Request $request, int $id): JsonResponse
     {
+        $payload = $this->decodeMutationPayload($request);
+        if (!isset($payload['quantity']) || !is_int($payload['quantity']) || $payload['quantity'] < 1) {
+            throw new BadRequestHttpException('quantity must be a positive integer.');
+        }
+
         $cart = $this->resolveCart($request);
-        $payload = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
-        $result = $this->mutationService->updateItemQuantity($cart, $id, (int) $payload['quantity']);
+        $result = $this->mutationService->updateItemQuantity($cart, $id, $payload['quantity']);
 
         return new JsonResponse($result->toArray(), $result->changed ? Response::HTTP_OK : Response::HTTP_NOT_FOUND);
     }
@@ -98,7 +112,27 @@ final class CartController
     }
 
     /**
-     * Returns the value produced by resolveCart for this Carting runtime responsibility.
+     * Validates the JSON object before a mutation can create or change a cart.
+     *
+     * @return array<string, mixed>
+     */
+    private function decodeMutationPayload(Request $request): array
+    {
+        try {
+            $payload = json_decode($request->getContent(), false, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $exception) {
+            throw new BadRequestHttpException('Request body must be valid JSON.', $exception);
+        }
+
+        if (!$payload instanceof \stdClass) {
+            throw new BadRequestHttpException('Request body must be a JSON object.');
+        }
+
+        return (array) $payload;
+    }
+
+    /**
+     * Returns the active cart, creating one only when no cart token is supplied.
      */
     private function resolveCart(Request $request): Cart
     {
