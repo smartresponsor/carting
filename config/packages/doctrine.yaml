@@ -9,6 +9,7 @@ doctrine:
         mapping_types:
           ltree: string
   orm:
+    naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
     mappings:
       Carting:
         is_bundle: false
