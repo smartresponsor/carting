@@ -8,4 +8,5 @@ return [
     Symfony\Bundle\SecurityBundle\SecurityBundle::class => ['all' => true],
     EasyCorp\Bundle\EasyAdminBundle\EasyAdminBundle::class => ['all' => true],
     App\Carting\CartingBundle::class => ['all' => true],
+    App\Objecting\ObjectBundle::class => ['all' => true],
 ];
