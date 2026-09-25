@@ -337,6 +337,34 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 - This isolation keeps the legal/licensing change out of the Carting RC commit without discarding or claiming it.
 - Before commit, git status and git diff --cached must be rechecked; after commit, restore the license field, verify it remains dirty, and only then push the committed Carting branch.
 
+## 2026-09-25 — Canon055 terminology convergence
+
+### Reconnaissance and market baseline
+- Re-read Carting AGENTS/README/Composer/Gating surfaces, the current RC journal, and the required Objecting, Cruding, Viewing, Interfacing, Gating, and Canonization dependency contour.
+- Consulted Canon004, Canon018, Canon021, Canon022, Canon052, Canon053, Canon054, and newly materialized Canon055 textual rules directly in Canonization; Gating remains the executable enforcement companion.
+- Market comparison remains boundary-consistent: mature cart systems such as Medusa keep mutable cart state and explicit adjustment facts in the cart module while pricing/promotion computation and committed-order ownership remain separate modules.
+- Baseline worktree contained a concurrent composer.json license change plus an accidental consumer .gating README replacement with the Gating owner README. The license change is preserved and excluded from authorship claims.
+
+### RC-critical workstream
+- Resolve the new Canon055 hard failure without changing cart runtime semantics: replace consumer-brand umbrella terminology in current human-facing Carting documentation and Composer description with neutral platform/component terminology.
+- Restore consumer .gating/README.md to the Canon052 artifact-only boundary.
+
+### Growth workstream (non-blocking)
+- Preserve prior growth debt: behaviorally meaningful method-coverage uplift and truthful Canon042 behavioral/UI evidence only when explicit eligible inventories exist.
+
+### Baseline verification
+- composer gate: FAIL only on Canon055 terminology candidates in AGENTS.md, README.md, delivery/jira/README.adoc, and composer.json description.
+- composer quality: PHP-CS-Fixer PASS, PHPStan PASS, PHPUnit PASS (73 tests / 259 assertions), then FAIL only at the same Canon055 gate.
+- composer schema:parity: PASS — 9 migrations / 77 SQL queries; mapping valid and schema synchronized.
+- composer validate:prod: PASS.
+
+### Material implementation
+- Renamed the Carting AGENTS umbrella heading to neutral Platform Rules.
+- Removed consumer-brand ownership wording from the Carting README and Composer description.
+- Reworded the Jira delivery/import schema as platform-wide rather than consumer-wide.
+- Restored .gating/README.md to the repository-local artifact-only contract required by Canon052.
+
+
 
 
 

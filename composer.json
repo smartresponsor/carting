@@ -1,6 +1,6 @@
 {
   "name": "carting/cart",
-  "description": "Smart Responsor Carting component for mutable cart and checkout handoff responsibility.",
+  "description": "Carting component for mutable cart and checkout handoff responsibility.",
   "type": "symfony-bundle",
   "license": "proprietary",
   "minimum-stability": "dev",

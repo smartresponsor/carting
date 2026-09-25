@@ -1,6 +1,6 @@
 # Carting
 
-Carting is the Smart Responsor component responsible for mutable shopping cart operations and checkout handoff. It manages anonymous and authenticated user selection states before order confirmation.
+Carting is the component responsible for mutable shopping cart operations and checkout handoff. It manages anonymous and authenticated user selection states before order confirmation.
 
 This module is **not** responsible for product inventory validation, price catalog management, payment processing, or order shipping.
 

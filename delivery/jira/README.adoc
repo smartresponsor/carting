@@ -1,5 +1,5 @@
 = Carting Jira Import Surface
 
-This directory is reserved for the Smart Responsor-wide Jira delivery/import schema.
+This directory is reserved for the platform-wide Jira delivery/import schema.
 
 The component is intentionally delivered with a stable location for future one-click import artifacts.
