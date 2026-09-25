@@ -1,4 +1,5 @@
 parameters:
+  tmpDir: var/phpstan
   level: 6
   paths:
     - src
@@ -7,7 +8,7 @@ parameters:
   ignoreErrors:
     -
       identifier: property.unusedType
-      path: src/Entity/Cart.php
+      path: src/Entity/CartEntity.php
       count: 1
     -
       identifier: property.unusedType
@@ -19,5 +20,5 @@ parameters:
       count: 1
     -
       identifier: property.unusedType
-      path: src/Entity/CartItem.php
+      path: src/Entity/CartItemEntity.php
       count: 1

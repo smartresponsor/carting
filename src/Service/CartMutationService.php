@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
-use App\Carting\Entity\Cart;
-use App\Carting\Entity\CartItem;
+use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\CartItemEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\ServiceInterface\CartAvailabilityCheckerInterface;
 use App\Carting\ServiceInterface\CartOfferProviderInterface;
@@ -31,9 +31,9 @@ final class CartMutationService
     /**
      * Executes the create behavior owned by this Carting runtime responsibility.
      */
-    public function create(string $currencyCode = 'USD', ?string $ownerReference = null): Cart
+    public function create(string $currencyCode = 'USD', ?string $ownerReference = null): CartEntity
     {
-        $cart = new Cart($this->cartTokenService->generateToken(), $currencyCode, $ownerReference);
+        $cart = new CartEntity($this->cartTokenService->generateToken(), $currencyCode, $ownerReference);
         $this->cartRepository->save($cart);
 
         return $cart;
@@ -42,7 +42,7 @@ final class CartMutationService
     /**
      * Executes the addItem behavior owned by this Carting runtime responsibility.
      */
-    public function addItem(Cart $cart, string $offerReference, int $quantity): CartMutationResultDTO
+    public function addItem(CartEntity $cart, string $offerReference, int $quantity): CartMutationResultDTO
     {
         $this->lifecycleGuard->assertActive($cart, 'add item to');
 
@@ -78,7 +78,7 @@ final class CartMutationService
             throw new \UnexpectedValueException('Offer provider returned a negative unit price.');
         }
 
-        if ($existingItem instanceof CartItem) {
+        if ($existingItem instanceof CartItemEntity) {
             $existingItem->increaseBy($quantity);
             $cart->touch();
             $this->cartRepository->save($cart);
@@ -86,7 +86,7 @@ final class CartMutationService
             return new CartMutationResultDTO(true, 'Cart item quantity increased.', $this->summaryService->summarize($cart));
         }
 
-        $cart->addItem(new CartItem(
+        $cart->addItem(new CartItemEntity(
             $snapshot->offerReference,
             $snapshot->title,
             $snapshot->unitPriceMinor,
@@ -103,7 +103,7 @@ final class CartMutationService
     /**
      * Executes the updateItemQuantity behavior owned by this Carting runtime responsibility.
      */
-    public function updateItemQuantity(Cart $cart, int $cartItemId, int $quantity): CartMutationResultDTO
+    public function updateItemQuantity(CartEntity $cart, int $cartItemId, int $quantity): CartMutationResultDTO
     {
         $this->lifecycleGuard->assertActive($cart, 'update item quantity on');
 
@@ -123,7 +123,7 @@ final class CartMutationService
     /**
      * Executes the removeItem behavior owned by this Carting runtime responsibility.
      */
-    public function removeItem(Cart $cart, int $cartItemId): CartMutationResultDTO
+    public function removeItem(CartEntity $cart, int $cartItemId): CartMutationResultDTO
     {
         $this->lifecycleGuard->assertActive($cart, 'remove item from');
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Carting\Tests\Unit\Controller;
 
 use App\Carting\Controller\CartController;
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\Service\CartAdjustmentEstimateService;
 use App\Carting\Service\CartCheckoutPreparationService;
@@ -17,7 +17,7 @@ use App\Carting\Factory\CartSurfaceContractFactory;
 use App\Carting\Service\CartTokenService;
 use App\Carting\ServiceInterface\CartOfferProviderInterface;
 use App\Carting\Snapshot\CartOfferSnapshot;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Carting\RepositoryInterface\CartCheckoutHandoffRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -39,7 +39,7 @@ final class CartControllerTest extends TestCase
 
     public function testMutationResponseUsesExplicitArrayContract(): void
     {
-        $cart = new Cart('token', 'USD');
+        $cart = new CartEntity('token', 'USD');
         $repository = $this->createStub(CartRepositoryInterface::class);
         $repository->method('findActiveByToken')->willReturn($cart);
         $request = Request::create(
@@ -72,7 +72,7 @@ final class CartControllerTest extends TestCase
     {
         $repository = $this->createMock(CartRepositoryInterface::class);
         $repository->expects(self::never())->method('save');
-        $cart = new Cart('token', 'USD');
+        $cart = new CartEntity('token', 'USD');
         $repository->method('findActiveByToken')->willReturn($cart);
         $request = Request::create(
             '/cart/items',
@@ -116,7 +116,7 @@ final class CartControllerTest extends TestCase
             $summaryService,
             new CartCheckoutReadinessService($lifecycleGuard),
             new CartAdjustmentEstimateService(),
-            $this->createStub(EntityManagerInterface::class),
+            $this->createStub(CartCheckoutHandoffRepositoryInterface::class),
         );
 
         return new CartController(

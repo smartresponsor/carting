@@ -8,7 +8,7 @@ use App\Carting\DTO\CartCheckoutPayloadDTO;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
 use App\Carting\Enum\CartStatus;
 use App\Carting\ServiceInterface\CartCheckoutHandoffConsumerInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Carting\RepositoryInterface\CartCheckoutHandoffRepositoryInterface;
 
 /**
  * Defines the CartCheckoutHandoffCompletionService responsibility used by the Carting component runtime.
@@ -19,7 +19,7 @@ final class CartCheckoutHandoffCompletionService
      * Initializes the dependencies and state required by this Carting runtime responsibility.
      */
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private readonly CartCheckoutHandoffRepositoryInterface $handoffRepository,
         private readonly ?CartCheckoutHandoffConsumerInterface $handoffConsumer = null,
     ) {}
 
@@ -55,9 +55,7 @@ final class CartCheckoutHandoffCompletionService
 
         $handoff->markAccepted($downstreamReference);
         $cart->markConverted();
-        $this->entityManager->persist($handoff);
-        $this->entityManager->persist($cart);
-        $this->entityManager->flush();
+        $this->handoffRepository->saveAccepted($handoff);
 
         return $downstreamReference;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Provider;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\ServiceInterface\CartSurfaceProviderInterface;
 use App\Carting\DTO\CartMiniCartDTO;
@@ -73,7 +73,7 @@ final class CartSurfaceProvider implements CartSurfaceProviderInterface
     /**
      * Returns the value produced by resolveActiveCart for this Carting runtime responsibility.
      */
-    private function resolveActiveCart(string $cartToken): Cart
+    private function resolveActiveCart(string $cartToken): CartEntity
     {
         $cart = $this->cartRepository->findActiveByToken($cartToken);
         if (!$cart) {

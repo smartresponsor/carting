@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Integration\Doctrine;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\Entity\CartAdjustmentEntity;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
-use App\Carting\Entity\CartItem;
+use App\Carting\Entity\CartItemEntity;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\RuntimeReflectionService;
@@ -17,17 +17,19 @@ final class CartDoctrineMetadataTest extends TestCase
 {
     public function testCartUsesDoctrineOptimisticVersioning(): void
     {
-        $metadata = $this->loadMetadata(Cart::class);
+        $metadata = $this->loadMetadata(CartEntity::class);
 
         self::assertTrue($metadata->isVersioned);
         self::assertSame('version', $metadata->versionField);
         self::assertSame('integer', $metadata->getTypeOfField('version'));
-        self::assertSame(1, $metadata->getFieldMapping('version')->options['default'] ?? null);
+        self::assertSame('string', $metadata->getTypeOfField('etag'));
+        self::assertSame(128, $metadata->getFieldMapping('etag')->length);
+        self::assertTrue($metadata->getFieldMapping('etag')->nullable ?? false);
     }
 
     public function testCartTableContractIsExplicit(): void
     {
-        $metadata = $this->loadMetadata(Cart::class);
+        $metadata = $this->loadMetadata(CartEntity::class);
 
         self::assertSame('cart_cart', $metadata->getTableName());
         self::assertSame(96, $metadata->getFieldMapping('cartToken')->length);
@@ -45,7 +47,7 @@ final class CartDoctrineMetadataTest extends TestCase
 
     public function testCartItemTableContractIsExplicit(): void
     {
-        $metadata = $this->loadMetadata(CartItem::class);
+        $metadata = $this->loadMetadata(CartItemEntity::class);
 
         self::assertSame('cart_item', $metadata->getTableName());
         self::assertSame('cart_id', $metadata->getSingleAssociationJoinColumnName('cart'));

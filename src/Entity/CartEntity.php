@@ -8,7 +8,9 @@ use App\Carting\Enum\CartAdjustmentType;
 use App\Carting\Enum\CartStatus;
 use App\Carting\Repository\CartRepository;
 use App\Objecting\EntityInterface\ObjectAuditedInterface;
+use App\Objecting\EntityInterface\ObjectVersionedInterface;
 use App\Objecting\EntityTrait\Embeddable\ObjectAuditEmbeddableTrait;
+use App\Objecting\EntityTrait\Embeddable\ObjectVersionEmbeddableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,9 +23,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Defines the Cart responsibility used by the Carting component runtime.
  */
-class Cart implements ObjectAuditedInterface
+class CartEntity implements ObjectAuditedInterface, ObjectVersionedInterface
 {
     use ObjectAuditEmbeddableTrait;
+    use ObjectVersionEmbeddableTrait;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -41,8 +44,8 @@ class Cart implements ObjectAuditedInterface
     #[ORM\Column(type: 'string', length: 32, enumType: CartStatus::class)]
     private CartStatus $status = CartStatus::Active;
 
-    /** @var Collection<int, CartItem> */
-    #[ORM\OneToMany(mappedBy: 'cart', targetEntity: CartItem::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    /** @var Collection<int, CartItemEntity> */
+    #[ORM\OneToMany(mappedBy: 'cart', targetEntity: CartItemEntity::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $items;
 
     /** @var Collection<int, CartAdjustmentEntity> */
@@ -51,10 +54,6 @@ class Cart implements ObjectAuditedInterface
 
     #[ORM\Column(name: 'expires_at', type: 'datetime_immutable', nullable: true)]
     private ?\DateTimeImmutable $expiresAt = null;
-
-    #[ORM\Version]
-    #[ORM\Column(type: 'integer', options: ['default' => 1])]
-    private int $version = 1;
 
     /**
      * Initializes the dependencies and state required by this Carting runtime responsibility.
@@ -83,6 +82,7 @@ class Cart implements ObjectAuditedInterface
         $this->items = new ArrayCollection();
         $this->adjustments = new ArrayCollection();
         $this->initializeObjectAudit();
+        $this->initializeObjectVersion();
     }
 
     /**
@@ -127,17 +127,10 @@ class Cart implements ObjectAuditedInterface
     {
         return $this->expiresAt;
     }
-    /**
-     * Returns the value produced by getVersion for this Carting runtime responsibility.
-     */
-    public function getVersion(): int
-    {
-        return $this->version;
-    }
 
     /**
      * Returns the value produced by getItems for this Carting runtime responsibility.
-     * @return Collection<int, CartItem>
+     * @return Collection<int, CartItemEntity>
      */
     public function getItems(): Collection
     {
@@ -244,7 +237,7 @@ class Cart implements ObjectAuditedInterface
     /**
      * Executes the addItem behavior owned by this Carting runtime responsibility.
      */
-    public function addItem(CartItem $item): void
+    public function addItem(CartItemEntity $item): void
     {
         $this->assertActiveFor('add item to');
 
@@ -258,7 +251,7 @@ class Cart implements ObjectAuditedInterface
     /**
      * Executes the removeItem behavior owned by this Carting runtime responsibility.
      */
-    public function removeItem(CartItem $item): void
+    public function removeItem(CartItemEntity $item): void
     {
         $this->assertActiveFor('remove item from');
 

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Unit\Service;
 
-use App\Carting\Entity\Cart;
-use App\Carting\Entity\CartItem;
+use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\CartItemEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\Service\CartLifecycleGuardService;
 use App\Carting\Service\CartMergeService;
@@ -15,7 +15,7 @@ final class CartMergeServiceTest extends TestCase
 {
     public function testRecoverReturnsExistingOwnerCartWithoutGuest(): void
     {
-        $owner = new Cart('owner', 'USD', 'owner-1');
+        $owner = new CartEntity('owner', 'USD', 'owner-1');
         $repository = $this->createMock(CartRepositoryInterface::class);
         $repository->expects(self::once())->method('findActiveByOwnerReference')->with('owner-1')->willReturn($owner);
         $repository->expects(self::never())->method('save');
@@ -28,7 +28,7 @@ final class CartMergeServiceTest extends TestCase
 
     public function testRecoverClaimsGuestWhenOwnerHasNoActiveCart(): void
     {
-        $guest = new Cart('guest', 'USD');
+        $guest = new CartEntity('guest', 'USD');
         $repository = $this->createMock(CartRepositoryInterface::class);
         $repository->expects(self::once())->method('findActiveByOwnerReference')->with('owner-1')->willReturn(null);
         $repository->expects(self::once())->method('save')->with($guest);
@@ -42,7 +42,7 @@ final class CartMergeServiceTest extends TestCase
 
     public function testClaimGuestCartAssignsOwnerAndPersists(): void
     {
-        $guest = new Cart('guest', 'USD');
+        $guest = new CartEntity('guest', 'USD');
         $repository = $this->createMock(CartRepositoryInterface::class);
         $repository->expects(self::once())->method('save')->with($guest);
 
@@ -58,14 +58,14 @@ final class CartMergeServiceTest extends TestCase
         $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
 
         $this->expectException(\LogicException::class);
-        $service->claimGuestCart(new Cart('owned', 'USD', 'owner-1'), 'owner-2');
+        $service->claimGuestCart(new CartEntity('owned', 'USD', 'owner-1'), 'owner-2');
     }
 
     public function testMergeCopiesGuestItemAndMarksGuestCartMerged(): void
     {
-        $guest = new Cart('guest', 'USD');
-        $owner = new Cart('owner', 'USD', 'owner-1');
-        $guestItem = new CartItem('offer-1', 'Offer 1', 1000, 'USD', 2, ['source' => 'guest']);
+        $guest = new CartEntity('guest', 'USD');
+        $owner = new CartEntity('owner', 'USD', 'owner-1');
+        $guestItem = new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 2, ['source' => 'guest']);
         $guest->addItem($guestItem);
 
         $repository = $this->createMock(CartRepositoryInterface::class);
@@ -75,7 +75,7 @@ final class CartMergeServiceTest extends TestCase
             ->mergeGuestCartIntoOwnerCart($guest, $owner);
 
         $ownerItem = $result->getItems()->first();
-        self::assertInstanceOf(CartItem::class, $ownerItem);
+        self::assertInstanceOf(CartItemEntity::class, $ownerItem);
         self::assertNotSame($guestItem, $ownerItem);
         self::assertSame($guest, $guestItem->getCart());
         self::assertSame($owner, $ownerItem->getCart());
@@ -85,10 +85,10 @@ final class CartMergeServiceTest extends TestCase
 
     public function testMergeCombinesMatchingCommercialSnapshotQuantity(): void
     {
-        $guest = new Cart('guest', 'USD');
-        $owner = new Cart('owner', 'USD', 'owner-1');
-        $guest->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 2, ['revision' => 'same']));
-        $owner->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 3, ['revision' => 'same']));
+        $guest = new CartEntity('guest', 'USD');
+        $owner = new CartEntity('owner', 'USD', 'owner-1');
+        $guest->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 2, ['revision' => 'same']));
+        $owner->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 3, ['revision' => 'same']));
 
         $repository = $this->createStub(CartRepositoryInterface::class);
         $repository->method('save');
@@ -102,10 +102,10 @@ final class CartMergeServiceTest extends TestCase
 
     public function testMergePreservesConflictingSnapshotsAsSeparateOwnerLines(): void
     {
-        $guest = new Cart('guest', 'USD');
-        $owner = new Cart('owner', 'USD', 'owner-1');
-        $guest->addItem(new CartItem('offer-1', 'Offer 1', 900, 'USD', 2, ['priceRevision' => 'guest']));
-        $owner->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 3, ['priceRevision' => 'owner']));
+        $guest = new CartEntity('guest', 'USD');
+        $owner = new CartEntity('owner', 'USD', 'owner-1');
+        $guest->addItem(new CartItemEntity('offer-1', 'Offer 1', 900, 'USD', 2, ['priceRevision' => 'guest']));
+        $owner->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 3, ['priceRevision' => 'owner']));
 
         $repository = $this->createStub(CartRepositoryInterface::class);
         $repository->method('save');
@@ -115,11 +115,11 @@ final class CartMergeServiceTest extends TestCase
 
         self::assertCount(2, $result->getItems());
         self::assertSame([1000, 900], array_map(
-            static fn(CartItem $item): int => $item->getUnitPriceMinor(),
+            static fn(CartItemEntity $item): int => $item->getUnitPriceMinor(),
             $result->getItems()->toArray(),
         ));
         self::assertSame([3, 2], array_map(
-            static fn(CartItem $item): int => $item->getQuantity(),
+            static fn(CartItemEntity $item): int => $item->getQuantity(),
             $result->getItems()->toArray(),
         ));
         self::assertSame('merged', $guest->getStatus()->value);
@@ -127,7 +127,7 @@ final class CartMergeServiceTest extends TestCase
 
     public function testMergeRejectsSameCart(): void
     {
-        $cart = new Cart('token', 'USD');
+        $cart = new CartEntity('token', 'USD');
         $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
 
         $this->expectException(\InvalidArgumentException::class);
@@ -139,7 +139,7 @@ final class CartMergeServiceTest extends TestCase
         $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
 
         $this->expectException(\LogicException::class);
-        $service->mergeGuestCartIntoOwnerCart(new Cart('guest', 'USD'), new Cart('owner', 'EUR', 'owner-1'));
+        $service->mergeGuestCartIntoOwnerCart(new CartEntity('guest', 'USD'), new CartEntity('owner', 'EUR', 'owner-1'));
     }
 
     public function testMergeRejectsOwnedSourceCart(): void
@@ -148,8 +148,8 @@ final class CartMergeServiceTest extends TestCase
 
         $this->expectException(\LogicException::class);
         $service->mergeGuestCartIntoOwnerCart(
-            new Cart('guest', 'USD', 'owner-1'),
-            new Cart('owner', 'USD', 'owner-2'),
+            new CartEntity('guest', 'USD', 'owner-1'),
+            new CartEntity('owner', 'USD', 'owner-2'),
         );
     }
 
@@ -158,17 +158,17 @@ final class CartMergeServiceTest extends TestCase
         $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
 
         $this->expectException(\LogicException::class);
-        $service->mergeGuestCartIntoOwnerCart(new Cart('guest', 'USD'), new Cart('owner', 'USD'));
+        $service->mergeGuestCartIntoOwnerCart(new CartEntity('guest', 'USD'), new CartEntity('owner', 'USD'));
     }
 
     public function testMergeRejectsConvertedGuestCart(): void
     {
-        $guest = new Cart('guest', 'USD');
+        $guest = new CartEntity('guest', 'USD');
         $guest->markCheckoutPending();
         $guest->markConverted();
         $service = new CartMergeService($this->createStub(CartRepositoryInterface::class), new CartLifecycleGuardService());
 
         $this->expectException(\LogicException::class);
-        $service->mergeGuestCartIntoOwnerCart($guest, new Cart('owner', 'USD', 'owner-1'));
+        $service->mergeGuestCartIntoOwnerCart($guest, new CartEntity('owner', 'USD', 'owner-1'));
     }
 }

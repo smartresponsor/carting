@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 
 /**
@@ -19,7 +19,7 @@ final class CartRecoveryService
     /**
      * Returns the active saved cart for an owner without reactivating terminal carts.
      */
-    public function recoverActiveOwnerCart(string $ownerReference): ?Cart
+    public function recoverActiveOwnerCart(string $ownerReference): ?CartEntity
     {
         $ownerReference = trim($ownerReference);
         if ('' === $ownerReference) {

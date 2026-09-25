@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\Enum\CartStatus;
 use App\Carting\ServiceInterface\CartAvailabilityCheckerInterface;
 use App\Carting\DTO\CartCheckoutReadinessDTO;
@@ -25,7 +25,7 @@ final class CartCheckoutReadinessService
     /**
      * Executes the inspect behavior owned by this Carting runtime responsibility.
      */
-    public function inspect(Cart $cart): CartCheckoutReadinessDTO
+    public function inspect(CartEntity $cart): CartCheckoutReadinessDTO
     {
         $messages = [];
 

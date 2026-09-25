@@ -20,9 +20,9 @@ class CartAdjustmentEntity
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Cart::class, inversedBy: 'adjustments')]
+    #[ORM\ManyToOne(targetEntity: CartEntity::class, inversedBy: 'adjustments')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private Cart $cart;
+    private CartEntity $cart;
 
     #[ORM\Column(type: 'string', length: 32, enumType: CartAdjustmentType::class)]
     private CartAdjustmentType $type;
@@ -39,7 +39,7 @@ class CartAdjustmentEntity
     /**
      * Initializes the dependencies and state required by this Carting runtime responsibility.
      */
-    public function __construct(Cart $cart, CartAdjustmentType $type, string $label, int $amountMinor, ?string $sourceReference = null)
+    public function __construct(CartEntity $cart, CartAdjustmentType $type, string $label, int $amountMinor, ?string $sourceReference = null)
     {
         $label = trim($label);
         if ('' === $label) {
@@ -68,7 +68,7 @@ class CartAdjustmentEntity
     /**
      * Returns the value produced by getCart for this Carting runtime responsibility.
      */
-    public function getCart(): Cart
+    public function getCart(): CartEntity
     {
         return $this->cart;
     }

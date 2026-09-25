@@ -4,33 +4,31 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Unit\Service;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
-use App\Carting\Entity\CartItem;
+use App\Carting\Entity\CartItemEntity;
 use App\Carting\Service\CartAdjustmentEstimateService;
 use App\Carting\Service\CartCheckoutPreparationService;
 use App\Carting\Service\CartCheckoutReadinessService;
 use App\Carting\Service\CartLifecycleGuardService;
 use App\Carting\Service\CartSummaryService;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use App\Carting\RepositoryInterface\CartCheckoutHandoffRepositoryInterface;
 use PHPUnit\Framework\TestCase;
 
 final class CartCheckoutPreparationServiceTest extends TestCase
 {
-    public function testPreparePersistsHandoffAndMarksCartCheckoutPendingWithSingleFlush(): void
+    public function testPreparePersistsHandoffAndMarksCartCheckoutPending(): void
     {
-        $cart = new Cart('token', 'USD', 'owner-1');
-        $cart->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 2));
+        $cart = new CartEntity('token', 'USD', 'owner-1');
+        $cart->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 2));
 
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
+        $handoffRepository = $this->createMock(CartCheckoutHandoffRepositoryInterface::class);
+        $handoffRepository
             ->expects(self::once())
-            ->method('persist')
+            ->method('savePrepared')
             ->with(self::callback(static fn(object $entity): bool => $entity instanceof CartCheckoutHandoffEntity));
-        $entityManager->expects(self::once())->method('flush');
 
-        $handoff = $this->createService($entityManager)->prepare($cart);
+        $handoff = $this->createService($handoffRepository)->prepare($cart);
 
         self::assertSame('checkout_pending', $cart->getStatus()->value);
         self::assertSame('token', $handoff->getPayload()['cartToken']);
@@ -40,34 +38,30 @@ final class CartCheckoutPreparationServiceTest extends TestCase
 
     public function testPrepareRejectsAlreadyConvertedCart(): void
     {
-        $cart = new Cart('token', 'USD');
-        $cart->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 1));
+        $cart = new CartEntity('token', 'USD');
+        $cart->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 1));
         $cart->markCheckoutPending();
         $cart->markConverted();
 
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects(self::never())->method('persist');
-        $entityManager->expects(self::never())->method('flush');
+        $handoffRepository = $this->createMock(CartCheckoutHandoffRepositoryInterface::class);
+        $handoffRepository->expects(self::never())->method('savePrepared');
 
         $this->expectException(\LogicException::class);
-        $this->createService($entityManager)->prepare($cart);
+        $this->createService($handoffRepository)->prepare($cart);
     }
 
     public function testPrepareReturnsExistingHandoffForCheckoutPendingRetry(): void
     {
-        $cart = new Cart('token', 'USD', 'owner-1');
-        $cart->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 1));
+        $cart = new CartEntity('token', 'USD', 'owner-1');
+        $cart->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 1));
         $cart->markCheckoutPending();
         $handoff = new CartCheckoutHandoffEntity($cart, 'handoff-existing', ['cartToken' => 'token']);
 
-        $repository = $this->createStub(EntityRepository::class);
-        $repository->method('findOneBy')->willReturn($handoff);
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->method('getRepository')->willReturn($repository);
-        $entityManager->expects(self::never())->method('persist');
-        $entityManager->expects(self::never())->method('flush');
+        $handoffRepository = $this->createMock(CartCheckoutHandoffRepositoryInterface::class);
+        $handoffRepository->method('findForCart')->with($cart)->willReturn($handoff);
+        $handoffRepository->expects(self::never())->method('savePrepared');
 
-        $result = $this->createService($entityManager)->prepare($cart);
+        $result = $this->createService($handoffRepository)->prepare($cart);
 
         self::assertSame($handoff, $result);
         self::assertSame('handoff-existing', $result->getHandoffReference());
@@ -75,29 +69,27 @@ final class CartCheckoutPreparationServiceTest extends TestCase
 
     public function testPrepareRejectsCheckoutPendingCart(): void
     {
-        $cart = new Cart('token', 'USD');
-        $cart->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 1));
+        $cart = new CartEntity('token', 'USD');
+        $cart->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 1));
         $cart->markCheckoutPending();
 
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects(self::never())->method('persist');
-        $entityManager->expects(self::never())->method('flush');
+        $handoffRepository = $this->createMock(CartCheckoutHandoffRepositoryInterface::class);
+        $handoffRepository->expects(self::never())->method('savePrepared');
 
         $this->expectException(\LogicException::class);
-        $this->createService($entityManager)->prepare($cart);
+        $this->createService($handoffRepository)->prepare($cart);
     }
 
     public function testPrepareRejectsEmptyCart(): void
     {
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager->expects(self::never())->method('persist');
-        $entityManager->expects(self::never())->method('flush');
+        $handoffRepository = $this->createMock(CartCheckoutHandoffRepositoryInterface::class);
+        $handoffRepository->expects(self::never())->method('savePrepared');
 
         $this->expectException(\LogicException::class);
-        $this->createService($entityManager)->prepare(new Cart('token', 'USD'));
+        $this->createService($handoffRepository)->prepare(new CartEntity('token', 'USD'));
     }
 
-    private function createService(EntityManagerInterface $entityManager): CartCheckoutPreparationService
+    private function createService(CartCheckoutHandoffRepositoryInterface $handoffRepository): CartCheckoutPreparationService
     {
         $lifecycleGuard = new CartLifecycleGuardService();
 
@@ -105,7 +97,7 @@ final class CartCheckoutPreparationServiceTest extends TestCase
             new CartSummaryService(),
             new CartCheckoutReadinessService($lifecycleGuard),
             new CartAdjustmentEstimateService(),
-            $entityManager,
+            $handoffRepository,
         );
     }
 }

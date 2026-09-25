@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Unit\Entity;
 
-use App\Carting\Entity\Cart;
-use App\Carting\Entity\CartItem;
+use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\CartItemEntity;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -15,18 +15,18 @@ final class CartInvariantTest extends TestCase
     public function testCartRejectsInvalidCurrency(string $currency): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new Cart('token', $currency);
+        new CartEntity('token', $currency);
     }
 
     public function testCartItemRejectsNegativePrice(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        new CartItem('offer', 'Offer', -1, 'USD', 1);
+        new CartItemEntity('offer', 'Offer', -1, 'USD', 1);
     }
 
     public function testCartItemNormalizesCurrency(): void
     {
-        $item = new CartItem('offer', 'Offer', 100, 'usd', 1);
+        $item = new CartItemEntity('offer', 'Offer', 100, 'usd', 1);
 
         self::assertSame('USD', $item->getCurrencyCode());
     }
@@ -34,13 +34,13 @@ final class CartInvariantTest extends TestCase
     public function testCartCannotConvertBeforeCheckoutPending(): void
     {
         $this->expectException(\LogicException::class);
-        (new Cart('token', 'USD'))->markConverted();
+        (new CartEntity('token', 'USD'))->markConverted();
     }
 
     public function testCartCannotMutateAfterCheckoutPending(): void
     {
-        $cart = new Cart('token', 'USD');
-        $item = new CartItem('offer', 'Offer', 100, 'USD', 1);
+        $cart = new CartEntity('token', 'USD');
+        $item = new CartItemEntity('offer', 'Offer', 100, 'USD', 1);
         $cart->addItem($item);
         $cart->markCheckoutPending();
 
@@ -50,28 +50,38 @@ final class CartInvariantTest extends TestCase
 
     public function testCartHasDistinctMergedAndAbandonedTerminalStates(): void
     {
-        $merged = new Cart('merged', 'USD');
+        $merged = new CartEntity('merged', 'USD');
         $merged->markMerged();
         self::assertSame('merged', $merged->getStatus()->value);
 
-        $abandoned = new Cart('abandoned', 'USD');
+        $abandoned = new CartEntity('abandoned', 'USD');
         $abandoned->markAbandoned();
         self::assertSame('abandoned', $abandoned->getStatus()->value);
     }
 
     public function testCartUsesObjectingAuditLifecycle(): void
     {
-        $cart = new Cart('audit-cart', 'USD');
+        $cart = new CartEntity('audit-cart', 'USD');
 
         self::assertNull($cart->getModifiedAt());
         $cart->assignOwner('vendor-1');
         self::assertNotNull($cart->getModifiedAt());
     }
 
+    public function testCartUsesObjectingVersionLifecycle(): void
+    {
+        $cart = new CartEntity('versioned-cart', 'USD');
+
+        self::assertSame(1, $cart->getObjectVersion());
+        self::assertNull($cart->getObjectEtag());
+        $cart->bumpObjectVersion('cart-etag');
+        self::assertSame('cart-etag', $cart->getObjectEtag());
+    }
+
     public function testCartItemUsesObjectingAuditLifecycle(): void
     {
-        $cart = new Cart('audit-item', 'USD');
-        $item = new CartItem('offer', 'Offer', 100, 'USD', 1);
+        $cart = new CartEntity('audit-item', 'USD');
+        $item = new CartItemEntity('offer', 'Offer', 100, 'USD', 1);
         $cart->addItem($item);
 
         self::assertNull($item->getModifiedAt());

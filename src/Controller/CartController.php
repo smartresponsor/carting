@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Controller;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\Service\CartCheckoutPreparationService;
 use App\Carting\Service\CartMutationService;
@@ -19,7 +19,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[AsController]
-#[Route('/cart')]
+
 /**
  * Defines the CartController responsibility used by the Carting component runtime.
  */
@@ -36,8 +36,8 @@ final class CartController
         private readonly CartCheckoutPreparationService $checkoutPreparationService,
     ) {}
 
-    #[Route('', name: 'carting_cart_show', methods: ['GET'])]
-    #[Route('/', name: 'carting_cart_show_slash', methods: ['GET'])]
+    #[Route('/cart', name: 'carting_cart_show', methods: ['GET'])]
+    #[Route('/cart/', name: 'carting_cart_show_slash', methods: ['GET'])]
     /**
      * Executes the show behavior owned by this Carting runtime responsibility.
      */
@@ -48,7 +48,7 @@ final class CartController
         return $this->surfaceContractFactory->createSummarySurface($this->summaryService->summarize($cart));
     }
 
-    #[Route('/items', name: 'carting_cart_add_item', methods: ['POST'])]
+    #[Route('/cart/items', name: 'carting_cart_add_item', methods: ['POST'])]
     /**
      * Executes the addItem behavior owned by this Carting runtime responsibility.
      */
@@ -70,7 +70,7 @@ final class CartController
         return new JsonResponse($result->toArray(), $result->changed ? Response::HTTP_OK : Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
-    #[Route('/items/{id}', name: 'carting_cart_update_item', methods: ['PATCH'])]
+    #[Route('/cart/items/{id}', name: 'carting_cart_update_item', methods: ['PATCH'])]
     /**
      * Executes the updateItem behavior owned by this Carting runtime responsibility.
      */
@@ -87,7 +87,7 @@ final class CartController
         return new JsonResponse($result->toArray(), $result->changed ? Response::HTTP_OK : Response::HTTP_NOT_FOUND);
     }
 
-    #[Route('/items/{id}', name: 'carting_cart_remove_item', methods: ['DELETE'])]
+    #[Route('/cart/items/{id}', name: 'carting_cart_remove_item', methods: ['DELETE'])]
     /**
      * Executes the removeItem behavior owned by this Carting runtime responsibility.
      */
@@ -99,7 +99,7 @@ final class CartController
         return new JsonResponse($result->toArray(), $result->changed ? Response::HTTP_OK : Response::HTTP_NOT_FOUND);
     }
 
-    #[Route('/checkout', name: 'carting_cart_checkout', methods: ['POST'])]
+    #[Route('/cart/checkout', name: 'carting_cart_checkout', methods: ['POST'])]
     /**
      * Executes the checkout behavior owned by this Carting runtime responsibility.
      */
@@ -134,7 +134,7 @@ final class CartController
     /**
      * Returns the active cart, creating one only when no cart token is supplied.
      */
-    private function resolveCart(Request $request): Cart
+    private function resolveCart(Request $request): CartEntity
     {
         $cartToken = (string) $request->headers->get('X-Cart-Token', '');
         if ('' === $cartToken) {
@@ -142,7 +142,7 @@ final class CartController
         }
 
         $cart = $this->cartRepository->findActiveByToken($cartToken);
-        if (!$cart instanceof Cart) {
+        if (!$cart instanceof CartEntity) {
             throw new NotFoundHttpException('Active cart was not found for the provided cart token.');
         }
 

@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Carting\Entity;
 
+use App\Carting\Repository\CartCheckoutHandoffRepository;
 use App\Objecting\EntityInterface\ObjectAuditedInterface;
 use App\Objecting\EntityTrait\Embeddable\ObjectAuditEmbeddableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: CartCheckoutHandoffRepository::class)]
 #[ORM\Table(name: 'cart_checkout_handoff')]
 #[ORM\UniqueConstraint(name: 'cart_checkout_handoff_cart_unique', columns: ['cart_id'])]
 #[ORM\UniqueConstraint(name: 'uniq_cart_checkout_handoff_reference', columns: ['handoff_reference'])]
@@ -25,9 +26,9 @@ class CartCheckoutHandoffEntity implements ObjectAuditedInterface
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Cart::class)]
+    #[ORM\ManyToOne(targetEntity: CartEntity::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private Cart $cart;
+    private CartEntity $cart;
 
     #[ORM\Column(name: 'handoff_reference', type: 'string', length: 96)]
     private string $handoffReference;
@@ -46,7 +47,7 @@ class CartCheckoutHandoffEntity implements ObjectAuditedInterface
      * Initializes the dependencies and state required by this Carting runtime responsibility.
      * @param array<string, mixed> $payload
      */
-    public function __construct(Cart $cart, string $handoffReference, array $payload)
+    public function __construct(CartEntity $cart, string $handoffReference, array $payload)
     {
         $handoffReference = trim($handoffReference);
         if ('' === $handoffReference) {
@@ -69,7 +70,7 @@ class CartCheckoutHandoffEntity implements ObjectAuditedInterface
     /**
      * Returns the value produced by getCart for this Carting runtime responsibility.
      */
-    public function getCart(): Cart
+    public function getCart(): CartEntity
     {
         return $this->cart;
     }

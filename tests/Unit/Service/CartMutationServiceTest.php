@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Carting\Tests\Unit\Service;
 
 use App\Carting\DTO\CartAvailabilityResultDTO;
-use App\Carting\Entity\Cart;
-use App\Carting\Entity\CartItem;
+use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\CartItemEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\Service\CartLifecycleGuardService;
 use App\Carting\Service\CartMutationService;
@@ -21,8 +21,8 @@ final class CartMutationServiceTest extends TestCase
 {
     public function testAvailabilityChecksResultingQuantity(): void
     {
-        $cart = new Cart('token', 'USD');
-        $cart->addItem(new CartItem('offer-1', 'Offer 1', 1000, 'USD', 2));
+        $cart = new CartEntity('token', 'USD');
+        $cart->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 2));
 
         $availability = new class implements CartAvailabilityCheckerInterface {
             public int $checkedQuantity = 0;
@@ -62,7 +62,7 @@ final class CartMutationServiceTest extends TestCase
         });
 
         $this->expectException(\UnexpectedValueException::class);
-        $service->addItem(new Cart('token', 'USD'), 'offer-1', 1);
+        $service->addItem(new CartEntity('token', 'USD'), 'offer-1', 1);
     }
 
     public function testRejectsSnapshotWithDifferentCurrency(): void
@@ -75,7 +75,7 @@ final class CartMutationServiceTest extends TestCase
         });
 
         $this->expectException(\UnexpectedValueException::class);
-        $service->addItem(new Cart('token', 'USD'), 'offer-1', 1);
+        $service->addItem(new CartEntity('token', 'USD'), 'offer-1', 1);
     }
 
     public function testRejectsSnapshotWithNegativePrice(): void
@@ -88,7 +88,7 @@ final class CartMutationServiceTest extends TestCase
         });
 
         $this->expectException(\UnexpectedValueException::class);
-        $service->addItem(new Cart('token', 'USD'), 'offer-1', 1);
+        $service->addItem(new CartEntity('token', 'USD'), 'offer-1', 1);
     }
 
     private function createService(

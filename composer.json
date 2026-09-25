@@ -141,13 +141,13 @@
       "@schema:validate",
       "@php bin/console doctrine:migrations:up-to-date --env=test"
     ],
-    "gating:check": "php vendor/bin/gating check --target=. --profile=config/cart_gating_profile.yaml --rule-set=config/cart_gating_rules.yaml --policy-root=vendor/gating/gate/.gating --severity-config=vendor/gating/gate/.gating/config/severity.yaml",
+    "gating:check": "@gate",
     "qa": [
       "@cs:check",
       "@test",
       "@stan"
     ],
-    "gate": "@php vendor/bin/gating check --target=.",
+    "gate": "@php vendor/bin/gating check --target=. --profile=config/cart_gating_profile.yaml",
     "quality": [
       "@cs:check",
       "@stan",

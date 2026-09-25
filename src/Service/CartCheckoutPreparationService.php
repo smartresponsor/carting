@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
 use App\Carting\Enum\CartStatus;
 use App\Carting\DTO\CartAdjustmentViewDTO;
 use App\Carting\DTO\CartCheckoutPayloadDTO;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Carting\RepositoryInterface\CartCheckoutHandoffRepositoryInterface;
 
 /**
  * Defines the CartCheckoutPreparationService responsibility used by the Carting component runtime.
@@ -23,18 +23,16 @@ final class CartCheckoutPreparationService
         private readonly CartSummaryService $summaryService,
         private readonly CartCheckoutReadinessService $readinessService,
         private readonly CartAdjustmentEstimateService $adjustmentEstimateService,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly CartCheckoutHandoffRepositoryInterface $handoffRepository,
     ) {}
 
     /**
      * Executes the prepare behavior owned by this Carting runtime responsibility.
      */
-    public function prepare(Cart $cart): CartCheckoutHandoffEntity
+    public function prepare(CartEntity $cart): CartCheckoutHandoffEntity
     {
         if (CartStatus::CheckoutPending === $cart->getStatus()) {
-            $existingHandoff = $this->entityManager
-                ->getRepository(CartCheckoutHandoffEntity::class)
-                ->findOneBy(['cart' => $cart]);
+            $existingHandoff = $this->handoffRepository->findForCart($cart);
 
             if ($existingHandoff instanceof CartCheckoutHandoffEntity) {
                 return $existingHandoff;
@@ -78,8 +76,7 @@ final class CartCheckoutPreparationService
 
         $handoff = new CartCheckoutHandoffEntity($cart, bin2hex(random_bytes(24)), $payload->toArray());
         $cart->markCheckoutPending();
-        $this->entityManager->persist($handoff);
-        $this->entityManager->flush();
+        $this->handoffRepository->savePrepared($handoff);
 
         return $handoff;
     }

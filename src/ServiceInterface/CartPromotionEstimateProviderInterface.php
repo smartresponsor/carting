@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Carting\ServiceInterface;
 
 use App\Carting\DTO\CartAdjustmentEstimateDTO;
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 
 /**
  * Defines the CartPromotionEstimateProviderInterface responsibility used by the Carting component runtime.
@@ -17,5 +17,5 @@ interface CartPromotionEstimateProviderInterface
      *
      * @return list<CartAdjustmentEstimateDTO>
      */
-    public function estimatePromotions(Cart $cart): array;
+    public function estimatePromotions(CartEntity $cart): array;
 }

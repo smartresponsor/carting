@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\Enum\CartStatus;
 
 /**
@@ -15,7 +15,7 @@ final class CartLifecycleGuardService
     /**
      * Executes the assertActive behavior owned by this Carting runtime responsibility.
      */
-    public function assertActive(Cart $cart, string $operation): void
+    public function assertActive(CartEntity $cart, string $operation): void
     {
         if (CartStatus::Active === $cart->getStatus()) {
             return;
@@ -32,7 +32,7 @@ final class CartLifecycleGuardService
     /**
      * Returns the value produced by isExpiredByTime for this Carting runtime responsibility.
      */
-    public function isExpiredByTime(Cart $cart, ?\DateTimeImmutable $now = null): bool
+    public function isExpiredByTime(CartEntity $cart, ?\DateTimeImmutable $now = null): bool
     {
         $expiresAt = $cart->getExpiresAt();
 

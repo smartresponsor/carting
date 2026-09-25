@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Defines the CartItem responsibility used by the Carting component runtime.
  */
-class CartItem implements ObjectAuditedInterface
+class CartItemEntity implements ObjectAuditedInterface
 {
     use ObjectAuditEmbeddableTrait;
     #[ORM\Id]
@@ -24,9 +24,9 @@ class CartItem implements ObjectAuditedInterface
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Cart::class, inversedBy: 'items')]
+    #[ORM\ManyToOne(targetEntity: CartEntity::class, inversedBy: 'items')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private Cart $cart;
+    private CartEntity $cart;
 
     #[ORM\Column(name: 'offer_reference', type: 'string', length: 191)]
     private string $offerReference;
@@ -96,7 +96,7 @@ class CartItem implements ObjectAuditedInterface
     /**
      * Returns the value produced by getCart for this Carting runtime responsibility.
      */
-    public function getCart(): Cart
+    public function getCart(): CartEntity
     {
         return $this->cart;
     }
@@ -147,7 +147,7 @@ class CartItem implements ObjectAuditedInterface
     /**
      * Executes the attachToCart behavior owned by this Carting runtime responsibility.
      */
-    public function attachToCart(Cart $cart): void
+    public function attachToCart(CartEntity $cart): void
     {
         if ($cart->getCurrencyCode() !== $this->currencyCode) {
             throw new \DomainException('Cart item currency must match cart currency.');

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\DTO\CartAdjustmentViewDTO;
 use App\Carting\DTO\CartItemViewDTO;
 use App\Carting\DTO\CartSummaryDTO;
@@ -17,7 +17,7 @@ final class CartSummaryService
     /**
      * Returns the value produced by summarize for this Carting runtime responsibility.
      */
-    public function summarize(Cart $cart): CartSummaryDTO
+    public function summarize(CartEntity $cart): CartSummaryDTO
     {
         $items = [];
         $itemCount = 0;

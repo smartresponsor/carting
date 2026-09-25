@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
-use App\Carting\Entity\Cart;
-use App\Carting\Entity\CartItem;
+use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\CartItemEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 
 /**
@@ -24,7 +24,7 @@ final class CartMergeService
     /**
      * Recovers the persisted active cart for an authenticated owner and reconciles an optional guest cart.
      */
-    public function recoverOwnerCart(string $ownerReference, ?Cart $guestCart = null): ?Cart
+    public function recoverOwnerCart(string $ownerReference, ?CartEntity $guestCart = null): ?CartEntity
     {
         $ownerReference = trim($ownerReference);
         if ('' === $ownerReference) {
@@ -32,11 +32,11 @@ final class CartMergeService
         }
 
         $ownerCart = $this->cartRepository->findActiveByOwnerReference($ownerReference);
-        if (!$guestCart instanceof Cart) {
+        if (!$guestCart instanceof CartEntity) {
             return $ownerCart;
         }
 
-        if ($ownerCart instanceof Cart) {
+        if ($ownerCart instanceof CartEntity) {
             return $this->mergeGuestCartIntoOwnerCart($guestCart, $ownerCart);
         }
 
@@ -46,7 +46,7 @@ final class CartMergeService
     /**
      * Reassociates an active guest cart with an authenticated owner when no owner cart exists.
      */
-    public function claimGuestCart(Cart $guestCart, string $ownerReference): Cart
+    public function claimGuestCart(CartEntity $guestCart, string $ownerReference): CartEntity
     {
         $this->lifecycleGuard->assertActive($guestCart, 'claim');
         $this->assertGuestCart($guestCart);
@@ -60,7 +60,7 @@ final class CartMergeService
     /**
      * Executes the mergeGuestCartIntoOwnerCart behavior owned by this Carting runtime responsibility.
      */
-    public function mergeGuestCartIntoOwnerCart(Cart $guestCart, Cart $ownerCart): Cart
+    public function mergeGuestCartIntoOwnerCart(CartEntity $guestCart, CartEntity $ownerCart): CartEntity
     {
         if ($guestCart === $ownerCart) {
             throw new \InvalidArgumentException('Guest cart and owner cart must be different carts.');
@@ -89,7 +89,7 @@ final class CartMergeService
             }
 
             if (!$matched) {
-                $ownerCart->addItem(new CartItem(
+                $ownerCart->addItem(new CartItemEntity(
                     $guestItem->getOfferReference(),
                     $guestItem->getTitleSnapshot(),
                     $guestItem->getUnitPriceMinor(),
@@ -108,14 +108,14 @@ final class CartMergeService
         return $ownerCart;
     }
 
-    private function assertGuestCart(Cart $cart): void
+    private function assertGuestCart(CartEntity $cart): void
     {
         if (null !== $cart->getOwnerReference()) {
             throw new \LogicException('Guest cart must not already have an owner reference.');
         }
     }
 
-    private function hasSameCommercialSnapshot(CartItem $left, CartItem $right): bool
+    private function hasSameCommercialSnapshot(CartItemEntity $left, CartItemEntity $right): bool
     {
         return $left->getOfferReference() === $right->getOfferReference()
             && $left->getTitleSnapshot() === $right->getTitleSnapshot()

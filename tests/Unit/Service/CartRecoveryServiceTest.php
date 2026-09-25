@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Unit\Service;
 
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\Service\CartRecoveryService;
 use PHPUnit\Framework\TestCase;
@@ -13,7 +13,7 @@ final class CartRecoveryServiceTest extends TestCase
 {
     public function testRecoversPersistedActiveOwnerCart(): void
     {
-        $cart = new Cart('saved-token', 'USD', 'owner-1');
+        $cart = new CartEntity('saved-token', 'USD', 'owner-1');
         $repository = $this->createMock(CartRepositoryInterface::class);
         $repository
             ->expects(self::once())

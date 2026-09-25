@@ -15,3 +15,5 @@ services:
     alias: App\Carting\Provider\CartUnavailableOfferProvider
   App\Carting\RepositoryInterface\CartRepositoryInterface:
     alias: App\Carting\Repository\CartRepository
+  App\Carting\RepositoryInterface\CartCheckoutHandoffRepositoryInterface:
+    alias: App\Carting\Repository\CartCheckoutHandoffRepository

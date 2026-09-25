@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Carting\Service;
 
 use App\Carting\DTO\CartAdjustmentEstimateDTO;
-use App\Carting\Entity\Cart;
+use App\Carting\Entity\CartEntity;
 use App\Carting\Entity\CartAdjustmentEntity;
 use App\Carting\Enum\CartAdjustmentType;
 use App\Carting\ServiceInterface\CartPriceEstimateProviderInterface;
@@ -29,7 +29,7 @@ final class CartAdjustmentEstimateService
     /**
      * Executes the refresh behavior owned by this Carting runtime responsibility.
      */
-    public function refresh(Cart $cart): void
+    public function refresh(CartEntity $cart): void
     {
         if ($this->priceEstimateProvider instanceof CartPriceEstimateProviderInterface) {
             $cart->removeAdjustmentsOfType(CartAdjustmentType::PriceEstimate);
@@ -64,7 +64,7 @@ final class CartAdjustmentEstimateService
     /**
      * Materializes one typed external adjustment fact into Carting persistence.
      */
-    private function addEstimate(Cart $cart, CartAdjustmentType $type, CartAdjustmentEstimateDTO $estimate): void
+    private function addEstimate(CartEntity $cart, CartAdjustmentType $type, CartAdjustmentEstimateDTO $estimate): void
     {
         if (0 === $estimate->amountMinor) {
             return;
@@ -76,7 +76,7 @@ final class CartAdjustmentEstimateService
     /**
      * Executes the itemSubtotalMinor behavior owned by this Carting runtime responsibility.
      */
-    private function itemSubtotalMinor(Cart $cart): int
+    private function itemSubtotalMinor(CartEntity $cart): int
     {
         $subtotalMinor = 0;
         foreach ($cart->getItems() as $item) {
