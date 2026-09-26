@@ -35,7 +35,7 @@
 - PHPUnit allowed checks: PASS — 75 tests / 269 assertions.
 - Final deterministic verification: `quality` PASS (PHP-CS-Fixer clean, PHPStan zero errors, PHPUnit 75 tests / 269 assertions, Gating 9 rules / 0 failures / 0 warnings / 1 profile skip); `schema:parity` PASS on a clean `carting_test` database (9 migrations / 77 SQL queries, mapping valid, schema synchronized, migrations current); `validate:prod` PASS; Composer audit PASS with no advisories; Symfony `lint:container --env=test` PASS; YAML lint PASS for all 7 config files.
 - Runtime/UI applicability: Carting has no `public/` web root for the managed PHP-server probe, so no server was started or restarted. The only Playwright spec is a tooling-runner smoke that asserts the literal `cart` word and does not exercise HTTP/browser behavior; a capacity-rejected npm worker is therefore not behavioral evidence debt for this JSON mutation change. No user-visible UI changed and no screenshot is required.
-- Visual Gallery service itself is healthy at the shared workspace gallery. Remaining tail is Git isolation/publication and post-push verification; the concurrent `composer.json` license edit remains intentionally outside this change.
+- Visual Gallery service itself is healthy at the shared workspace gallery. Git integration completed with signed implementation commit `9d6251d6dbdbf3632edd1a4ab39f366057acca86` published to `origin/rc/carting-schema-parity-20260914`; post-push branch state is 0 ahead / 0 behind. The concurrent `composer.json` license edit remains the only dirty path and intentionally stays outside Carting RC commits.
 
 
 ## 2026-09-23 — Generic Gating RC repair
