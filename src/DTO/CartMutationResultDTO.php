@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Carting\DTO;
 
+use App\Carting\Enum\CartMutationFailureReason;
+
 /**
  * Defines the CartMutationResultDTO responsibility used by the Carting component runtime.
  */
@@ -16,6 +18,7 @@ final readonly class CartMutationResultDTO
         public bool $changed,
         public string $message,
         public CartSummaryDTO $summary,
+        public ?CartMutationFailureReason $failureReason = null,
     ) {}
 
     /**

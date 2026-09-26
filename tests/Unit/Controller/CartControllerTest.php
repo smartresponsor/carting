@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Carting\Tests\Unit\Controller;
 
 use App\Carting\Controller\CartController;
+use App\Carting\DTO\CartAvailabilityResultDTO;
 use App\Carting\Entity\CartEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\Service\CartAdjustmentEstimateService;
@@ -16,6 +17,7 @@ use App\Carting\Service\CartSummaryService;
 use App\Carting\Factory\CartSurfaceContractFactory;
 use App\Carting\Service\CartTokenService;
 use App\Carting\ServiceInterface\CartOfferProviderInterface;
+use App\Carting\ServiceInterface\CartAvailabilityCheckerInterface;
 use App\Carting\Snapshot\CartOfferSnapshot;
 use App\Carting\RepositoryInterface\CartCheckoutHandoffRepositoryInterface;
 use PHPUnit\Framework\TestCase;
@@ -95,8 +97,41 @@ final class CartControllerTest extends TestCase
         $this->createController($repository)->updateItem($request, 1);
     }
 
-    private function createController(CartRepositoryInterface $repository): CartController
+    public function testPatchReturnsUnprocessableWhenRequestedQuantityIsUnavailable(): void
     {
+        $cart = new CartEntity('token', 'USD');
+        $cart->addItem(new \App\Carting\Entity\CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 2));
+
+        $repository = $this->createMock(CartRepositoryInterface::class);
+        $repository->method('findActiveByToken')->with('token')->willReturn($cart);
+        $repository->expects(self::never())->method('save');
+
+        $availability = new class implements CartAvailabilityCheckerInterface {
+            public function checkAvailability(string $offerReference, int $quantity): CartAvailabilityResultDTO
+            {
+                return new CartAvailabilityResultDTO(false, 2, 'stocking-test');
+            }
+        };
+
+        $request = Request::create(
+            '/cart/items/0',
+            'PATCH',
+            server: ['HTTP_X_CART_TOKEN' => 'token'],
+            content: '{"quantity":5}',
+        );
+
+        $response = $this->createController($repository, $availability)->updateItem($request, 0);
+        $payload = json_decode((string) $response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+
+        self::assertSame(422, $response->getStatusCode());
+        self::assertFalse($payload['changed']);
+        self::assertSame(2, $cart->getItems()->first()->getQuantity());
+    }
+
+    private function createController(
+        CartRepositoryInterface $repository,
+        ?CartAvailabilityCheckerInterface $availabilityChecker = null,
+    ): CartController {
         $summaryService = new CartSummaryService();
         $lifecycleGuard = new CartLifecycleGuardService();
         $offerProvider = new class implements CartOfferProviderInterface {
@@ -111,6 +146,7 @@ final class CartControllerTest extends TestCase
             $summaryService,
             $lifecycleGuard,
             $offerProvider,
+            $availabilityChecker,
         );
         $checkoutPreparationService = new CartCheckoutPreparationService(
             $summaryService,

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Carting\Controller;
 
 use App\Carting\Entity\CartEntity;
+use App\Carting\Enum\CartMutationFailureReason;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\Service\CartCheckoutPreparationService;
 use App\Carting\Service\CartMutationService;
@@ -84,7 +85,13 @@ final class CartController
         $cart = $this->resolveCart($request);
         $result = $this->mutationService->updateItemQuantity($cart, $id, $payload['quantity']);
 
-        return new JsonResponse($result->toArray(), $result->changed ? Response::HTTP_OK : Response::HTTP_NOT_FOUND);
+        $status = $result->changed
+            ? Response::HTTP_OK
+            : (CartMutationFailureReason::NotFound === $result->failureReason
+                ? Response::HTTP_NOT_FOUND
+                : Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        return new JsonResponse($result->toArray(), $status);
     }
 
     #[Route('/cart/items/{id}', name: 'carting_cart_remove_item', methods: ['DELETE'])]
@@ -96,7 +103,13 @@ final class CartController
         $cart = $this->resolveCart($request);
         $result = $this->mutationService->removeItem($cart, $id);
 
-        return new JsonResponse($result->toArray(), $result->changed ? Response::HTTP_OK : Response::HTTP_NOT_FOUND);
+        $status = $result->changed
+            ? Response::HTTP_OK
+            : (CartMutationFailureReason::NotFound === $result->failureReason
+                ? Response::HTTP_NOT_FOUND
+                : Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        return new JsonResponse($result->toArray(), $status);
     }
 
     #[Route('/cart/checkout', name: 'carting_cart_checkout', methods: ['POST'])]

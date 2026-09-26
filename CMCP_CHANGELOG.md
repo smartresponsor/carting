@@ -1,5 +1,43 @@
 # CMCP Execution Journal
 
+## 2026-09-26 — Quantity availability RC invariant
+
+### Reconnaissance and market baseline
+
+- Resolved Carting through Console MCP at `D:\PhpstormProjects\www\Carting`; starting HEAD `afe91ff72ac833d5619bbe38fdb39f15e2a108c1` on `rc/carting-schema-parity-20260914`, synchronized with its upstream. Baseline dirty state was limited to a concurrent `composer.json` license change and an accidental replacement of the consumer `.gating/README.md` with the Gating owner README.
+- Read Carting `AGENTS.md`, `README.md`, development Composer manifest, architecture AsciiDoc, RC milestone, current services/entities/controller/DTOs/tests, Gating profile surface, current Git state, and the existing execution journal. Code Memory planning resolves the Carting graph read/write and the umbrella `www` graph read-only; no repository `memory:scope:resolve` script is declared.
+- Read the required Objecting, Cruding, Viewing, Interfacing and Gating AGENTS/README/Composer contracts plus available manifests. Objecting has no tracked `MANIFEST.json` at HEAD; Interfacing has none. Canonization remained READ_ONLY.
+- Market/enterprise comparison stayed inside the Carting boundary: current Shopify cart/checkout APIs model cart state separately from checkout, use retry/idempotency semantics for cart-to-checkout conversion, and keep buyer/context facts on the cart. Pricing, inventory, promotion, tax, payment, shipping and committed-order ownership remain outside Carting.
+
+### Canon mapping and RC/growth split
+
+- Canon003: `CartMutationResultDTO` remains an explicit DTO under `src/DTO/`.
+- Canon012: a stable mutation failure cause is represented as typed `CartMutationFailureReason`, not inferred from message text or carried as an unshaped internal array.
+- Canon021: quantity mutation remains a Carting-owned business operation; no generic CRUD machinery is introduced.
+- Canon030: no Doctrine metadata changes are made, but the repository's executable schema-parity contract remains an RC gate.
+- Canon052: consumer `.gating/` is artifact-only; restored its README to the small consumer boundary and did not copy Gating owner policy/runtime material.
+- Canon053: Carting's development symlinks are limited to the explicit canonical exception set (`Gating`, `Cruding`, `Viewing`, `Interfacing`, `Collectioning`, `Objecting`, `Tabling`).
+- RC-critical workstream: close the direct quantity-update availability bypass. `addItem()` already checked resulting quantity, while `updateItemQuantity()` changed and persisted quantity without consulting the configured availability checker.
+- Growth remains separate: richer mutation outcome/public API ergonomics, idempotency keys, diagnostics/metrics, OpenAPI examples, and concurrency/load coverage are post-RC unless required by a proven correctness issue.
+
+### Material implementation and risks
+
+- Added typed `CartMutationFailureReason` with `NotFound` and `Unavailable`; `CartMutationResultDTO` carries it internally while preserving its existing serialized response shape.
+- `CartMutationService::updateItemQuantity()` now checks the requested resulting quantity before changing the entity or persisting. Availability rejection leaves the cart unchanged and returns a typed `Unavailable` result. Existing add-item rejection and missing-item results now carry the same typed cause vocabulary.
+- `CartController` preserves HTTP 404 for missing lines and maps availability rejection to 422 without branching on human-readable message strings.
+- Added service and controller regressions proving unavailable quantity PATCH does not mutate/persist and produces 422. Initial enum patch was mechanically truncated; immediate PHPUnit exposed it and the syntax was repaired before continuing.
+- Preserved the unrelated concurrent `composer.json` license change; it is not part of this Carting RC implementation and must not be absorbed into the RC commit.
+
+### Verification gates
+
+- Baseline Gating: PASS, zero failures/warnings in the currently exposed profile; Composer strict validation PASS.
+- Changed PHP lint: PASS after repair.
+- PHPUnit allowed checks: PASS — 75 tests / 269 assertions.
+- Final deterministic verification: `quality` PASS (PHP-CS-Fixer clean, PHPStan zero errors, PHPUnit 75 tests / 269 assertions, Gating 9 rules / 0 failures / 0 warnings / 1 profile skip); `schema:parity` PASS on a clean `carting_test` database (9 migrations / 77 SQL queries, mapping valid, schema synchronized, migrations current); `validate:prod` PASS; Composer audit PASS with no advisories; Symfony `lint:container --env=test` PASS; YAML lint PASS for all 7 config files.
+- Runtime/UI applicability: Carting has no `public/` web root for the managed PHP-server probe, so no server was started or restarted. The only Playwright spec is a tooling-runner smoke that asserts the literal `cart` word and does not exercise HTTP/browser behavior; a capacity-rejected npm worker is therefore not behavioral evidence debt for this JSON mutation change. No user-visible UI changed and no screenshot is required.
+- Visual Gallery service itself is healthy at the shared workspace gallery. Remaining tail is Git isolation/publication and post-push verification; the concurrent `composer.json` license edit remains intentionally outside this change.
+
+
 ## 2026-09-23 — Generic Gating RC repair
 
 ### Factual baseline and Canon mapping

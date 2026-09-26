@@ -6,6 +6,7 @@ namespace App\Carting\Service;
 
 use App\Carting\Entity\CartEntity;
 use App\Carting\Entity\CartItemEntity;
+use App\Carting\Enum\CartMutationFailureReason;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\ServiceInterface\CartAvailabilityCheckerInterface;
 use App\Carting\ServiceInterface\CartOfferProviderInterface;
@@ -61,7 +62,12 @@ final class CartMutationService
         $resultingQuantity = $quantity + ($existingItem?->getQuantity() ?? 0);
 
         if ($this->availabilityChecker && !$this->availabilityChecker->checkAvailability($offerReference, $resultingQuantity)->available) {
-            return new CartMutationResultDTO(false, 'Offer is not available in the requested quantity.', $this->summaryService->summarize($cart));
+            return new CartMutationResultDTO(
+                false,
+                'Offer is not available in the requested quantity.',
+                $this->summaryService->summarize($cart),
+                CartMutationFailureReason::Unavailable,
+            );
         }
 
         $snapshot = $this->offerProvider->provideOfferSnapshot($offerReference, $quantity);
@@ -109,6 +115,15 @@ final class CartMutationService
 
         foreach ($cart->getItems() as $item) {
             if ((int) $item->getId() === $cartItemId) {
+                if ($this->availabilityChecker && !$this->availabilityChecker->checkAvailability($item->getOfferReference(), $quantity)->available) {
+                    return new CartMutationResultDTO(
+                        false,
+                        'Offer is not available in the requested quantity.',
+                        $this->summaryService->summarize($cart),
+                        CartMutationFailureReason::Unavailable,
+                    );
+                }
+
                 $item->changeQuantity($quantity);
                 $cart->touch();
                 $this->cartRepository->save($cart);
@@ -117,7 +132,12 @@ final class CartMutationService
             }
         }
 
-        return new CartMutationResultDTO(false, 'Cart item was not found.', $this->summaryService->summarize($cart));
+        return new CartMutationResultDTO(
+            false,
+            'Cart item was not found.',
+            $this->summaryService->summarize($cart),
+            CartMutationFailureReason::NotFound,
+        );
     }
 
     /**
@@ -136,6 +156,11 @@ final class CartMutationService
             }
         }
 
-        return new CartMutationResultDTO(false, 'Cart item was not found.', $this->summaryService->summarize($cart));
+        return new CartMutationResultDTO(
+            false,
+            'Cart item was not found.',
+            $this->summaryService->summarize($cart),
+            CartMutationFailureReason::NotFound,
+        );
     }
 }
