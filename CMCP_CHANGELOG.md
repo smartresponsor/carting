@@ -1,5 +1,42 @@
 # CMCP Execution Journal
 
+## 2026-09-28 — Canon022/045 failure-runtime dependency remediation
+
+### Reconnaissance and RC selection
+
+- Resolved Carting through Console MCP at `D:\PhpstormProjects\www\Carting`; starting HEAD `a9f1a709eeb9f4054cd37064ce84a9913f3d3344` on `rc/carting-schema-parity-20260914`, synchronized 0 ahead / 0 behind with its upstream.
+- Pre-existing dirty state is `.gating/README.md` plus a `composer.json` license change to `PolyForm-Noncommercial-1.0.0`; both are preserved as pre-existing work and are not evidence of this remediation.
+- Consumed the supplied CanonScanning RED report for fingerprint `3196574bd053b752656efe31434a283b8ac7df2d4cb32aa3f0c334e759102cbb`: Canon022, Canon045, and Canon052 failed; Canon040/042 are coverage warnings. Consumed supplied Inspecting evidence: four medium observational PHP-structure findings, with no autofixable finding.
+- Read Carting guidance/README/manifests, current cart controller/mutation/entity surfaces and architecture/journal context; read the required helper contour and the current Canonization/Gating contracts relevant to Canon022, Canon045, Canon052, and Canon053. Cruding directly requires `failing/failure`; Failing publishes `App\Failing\FailingBundle`.
+- Market baseline remains aligned with mature cart systems: mutable cart state, buyer/context and checkout handoff live at the cart boundary, while inventory, pricing authority, payment, shipping and committed-order ownership remain external. Shopify's current Storefront Cart surface likewise keeps merchandise lines, buyer identity, estimated cost and checkout handoff distinct.
+
+### Canon mapping and bounded work
+
+- Canon022 applies because Carting exposes standalone Symfony boot surfaces; both Composer manifests must directly require `failing/failure`, and `config/bundles.php` must register `App\Failing\FailingBundle`.
+- Canon045 requires the development root to expose `../Failing` because locally linked Cruding requires it. Canon053 explicitly allows Failing as one of the closed sibling symlink exceptions, so the repair does not create a symlink-isolation conflict.
+- Canon052 separately reports that the existing consumer `.gating/` contains a copied executable Gating tree. The current run will not delete or overwrite that preserved tree because destructive operations are forbidden and `.gating/README.md` has pre-existing user changes.
+- RC-critical workstream: close the deterministic Failing runtime/dependency baseline and re-run Composer/Gating/quality verification. Growth remains separate: richer cart API ergonomics, diagnostics, idempotency and broader behavioral coverage are post-RC unless a gate proves them correctness-critical.
+
+### Planned gates
+
+- Composer dev/prod validation and dependency resolution consistency.
+- Targeted/full Gating, PHP-CS-Fixer, PHPStan, PHPUnit, schema parity where applicable, and post-mutation Inspecting.
+- Git diff/status classification before any commit; do not absorb the pre-existing license or `.gating/README.md` changes unintentionally.
+
+### Verification and current blockers
+
+- Composer strict/check-lock: PASS after a package-scoped `composer update failing/failure --with-all-dependencies`; the lock now records `failing/failure` and refreshed eleven already-declared packages/dependencies.
+- `validate:prod`: PASS. Profiled `gate`: PASS, 9 rules / 0 failures / 0 warnings / 1 skip. PHP-CS-Fixer: PASS. PHPStan: PASS. PHPUnit: PASS — 75 tests / 269 assertions. Doctrine schema parity: PASS — 9 migrations / 77 SQL queries, mapping valid, schema synchronized and migrations current. Symfony container lint: PASS. YAML lint: PASS for 7 files. Composer audit: PASS with no advisories.
+- RC diagnostic reports zero issues in its canon contour; its only readiness blocker is the dirty worktree. This does not erase the supplied Canon052 evidence: the preserved executable `.gating/` tree remains physically present, so the exact Canon052 artifact-surface rule is still unresolved under the run's destructive-operation prohibition.
+- Post-mutation standalone Inspecting initially timed out at the transport layer, but a persisted normalized report was recovered at `D:\\PhpstormProjects\\www\\Inspecting\\.inspecting\\reports\\D--PhpstormProjects-www-Carting-20260928-101751.json`. It completed at 10:19:15Z with PHPStan 0 errors and four medium, non-autofixable PHP-structure findings (CartController cohesion; CartEntity public API/cohesion; CartMutationService::addItem() length). No new dependency/config regression was reported.
+- Coverage evidence refreshed via `composer run-script test:coverage`: PASS — 75 tests / 269 assertions under Xdebug; the previous stale coverage evidence warning is no longer attributable to an old test run. Profiled `gate` re-run remains PASS — 9 rules / 0 failures / 0 warnings / 1 skip.
+- Playwright tooling smoke re-run via `npm run test`: PASS — 1/1 test. This only proves the repository's browser-test runner is executable; it is not behavioral UI acceptance evidence for a user flow.
+- No browser/mobile UI, navigation, forms, or user-observable flow changed. Runtime/browser restart and screenshots are not applicable to this dependency/bundle-registration patch.
+- Async full RC validation was attempted through the durable Console MCP runner. The job failed before repository checks with `Path is outside the allowed roots: D:\\PhpstormProjects\\www\\Carting` even though synchronous Console MCP repository tools resolve the same workspace successfully; this is classified as runner infrastructure failure, not a Carting validation failure.
+- Synchronous `release_rc_validate` with the mixed profile subsequently completed: 4/4 validation commands passed (`composer validate`, PHPStan analysis, profiled Gating, syntax lint), its canon contour reports 0 issues, and readiness is `rc_diagnostic_green` with no blockers or warnings.
+- The failed async runner's generated `.console-mcp/` config/state/stdout/stderr/lease artifacts were moved individually into the allowlisted `var/cache` surface and removed with the guarded cache cleanup capability; final Git status contains no `.console-mcp/` residue.
+- Git mixed-hunk isolation was resolved without stash/reset/clean: the pre-existing `composer.json` license hunk was temporarily restored to its HEAD value, `composer validate --strict --check-lock` passed, and the four RC remediation files were committed as signed commit `92eab54` (`fix: align Carting failure dependency baseline`). The preserved `PolyForm-Noncommercial-1.0.0` license change was then restored exactly to the working tree, leaving it uncommitted and unrelated to the RC commit.
+
 ## 2026-09-26 — Quantity availability RC invariant
 
 ### Reconnaissance and market baseline
