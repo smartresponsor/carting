@@ -28,6 +28,16 @@
     },
     {
       "type": "path",
+      "url": "../Failing",
+      "options": {
+        "symlink": true,
+        "versions": {
+          "failing/failure": "dev-master"
+        }
+      }
+    },
+    {
+      "type": "path",
       "url": "../Viewing",
       "options": {
         "symlink": true,
@@ -80,6 +90,7 @@
   "require": {
     "php": "^8.4",
     "cruding/crud": "dev-master",
+    "failing/failure": "dev-master",
     "collectioning/collection": "dev-master",
     "tabling/table": "dev-master",
     "viewing/view": "dev-master",

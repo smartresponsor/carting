@@ -18,6 +18,11 @@
     },
     {
       "type": "vcs",
+      "url": "git@github.com:smartresponsor/failing.git",
+      "no-api": true
+    },
+    {
+      "type": "vcs",
       "url": "git@github.com:smartresponsor/viewing.git",
       "no-api": true
     },
@@ -45,6 +50,7 @@
   "require": {
     "php": "^8.4",
     "cruding/crud": "dev-master",
+    "failing/failure": "dev-master",
     "collectioning/collection": "dev-master",
     "tabling/table": "dev-master",
     "viewing/view": "dev-master",

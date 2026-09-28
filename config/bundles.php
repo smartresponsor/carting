@@ -9,4 +9,5 @@ return [
     EasyCorp\Bundle\EasyAdminBundle\EasyAdminBundle::class => ['all' => true],
     App\Carting\CartingBundle::class => ['all' => true],
     App\Objecting\ObjectBundle::class => ['all' => true],
+    App\Failing\FailingBundle::class => ['all' => true],
 ];
