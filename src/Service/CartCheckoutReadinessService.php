@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Service;
 
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\Enum\CartStatus;
 use App\Carting\ServiceInterface\CartAvailabilityCheckerInterface;
 use App\Carting\DTO\CartCheckoutReadinessDTO;

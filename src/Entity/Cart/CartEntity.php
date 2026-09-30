@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace App\Carting\Entity;
+namespace App\Carting\Entity\Cart;
 
+use App\Carting\Entity\CartAdjustmentEntity;
+use App\Carting\Entity\CartItemEntity;
 use App\Carting\Enum\CartAdjustmentType;
 use App\Carting\Enum\CartStatus;
 use App\Carting\Repository\CartRepository;

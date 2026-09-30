@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Carting\Service;
 
 use App\Carting\DTO\CartAdjustmentEstimateDTO;
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\Entity\CartAdjustmentEntity;
 use App\Carting\Enum\CartAdjustmentType;
 use App\Carting\ServiceInterface\CartPriceEstimateProviderInterface;

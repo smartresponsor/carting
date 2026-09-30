@@ -8,7 +8,7 @@ parameters:
   ignoreErrors:
     -
       identifier: property.unusedType
-      path: src/Entity/CartEntity.php
+      path: src/Entity/Cart/CartEntity.php
       count: 1
     -
       identifier: property.unusedType

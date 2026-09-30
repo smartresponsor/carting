@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Carting\Tests\Unit\Service;
 
 use App\Carting\DTO\CartCheckoutPayloadDTO;
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
 use App\Carting\Service\CartCheckoutHandoffCompletionService;
 use App\Carting\ServiceInterface\CartCheckoutHandoffConsumerInterface;

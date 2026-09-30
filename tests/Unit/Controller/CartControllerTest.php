@@ -6,7 +6,7 @@ namespace App\Carting\Tests\Unit\Controller;
 
 use App\Carting\Controller\CartController;
 use App\Carting\DTO\CartAvailabilityResultDTO;
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\Service\CartAdjustmentEstimateService;
 use App\Carting\Service\CartCheckoutPreparationService;

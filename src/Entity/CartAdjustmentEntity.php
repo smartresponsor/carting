@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Entity;
 
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\Enum\CartAdjustmentType;
 use Doctrine\ORM\Mapping as ORM;
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Integration\Doctrine;
 
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\Entity\CartAdjustmentEntity;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
 use App\Carting\Entity\CartItemEntity;

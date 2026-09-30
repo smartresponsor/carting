@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Repository;
 
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\Entity\CartCheckoutHandoffEntity;
 use App\Carting\RepositoryInterface\CartCheckoutHandoffRepositoryInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;

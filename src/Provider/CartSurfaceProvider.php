@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Provider;
 
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\RepositoryInterface\CartRepositoryInterface;
 use App\Carting\ServiceInterface\CartSurfaceProviderInterface;
 use App\Carting\DTO\CartMiniCartDTO;

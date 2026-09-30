@@ -6,7 +6,7 @@ namespace App\Carting\Tests\Unit\Service;
 
 use App\Carting\DTO\CartAdjustmentEstimateDTO;
 use App\Carting\DTO\CartPriceEstimateDTO;
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\Entity\CartAdjustmentEntity;
 use App\Carting\Entity\CartItemEntity;
 use App\Carting\Enum\CartAdjustmentType;

@@ -1,5 +1,48 @@
 # CMCP Execution Journal
 
+## 2026-09-29 — Canon052 consumer-artifact verification pass
+
+### Reconnaissance and market baseline
+- Resolved Carting through Console MCP on branch `rc/carting-schema-parity-20260914`, synchronized 0 ahead / 0 behind with upstream; preserved pre-existing dirty `.gating/README.md` and `composer.json`.
+- Read the supplied CanonScanning RED and Inspecting reports, Carting AGENTS/README/Composer manifests, architecture docs, representative controller/entity/mutation service, and the Canonization/Gating Canon052 texts.
+- Market baseline remains aligned with Carting's declared boundary: Shopify's 2026-07 Storefront Cart models buyer purchase intent, estimated cost, buyer identity, lines, and a checkout handoff URL; Medusa keeps cart management in a standalone Cart Module while committed order management is a separate Order Module. Pricing/inventory/payment/shipping/order commitment remain outside Carting except as typed facts/handoffs.
+
+### Canon mapping and RC/growth split
+- Canon052 applies. Development and production Composer integration already satisfy its package/script/path-repository requirements.
+- Current hard failure is solely consumer-local `.gating/` topology: copied Gating owner engine/policy files are physically present outside allowed generated-artifact directories.
+- RC-critical workstream: restore artifact-only `.gating/`, then re-run full Gating and deterministic quality/schema gates.
+- Growth workstream remains non-blocking: refactor `CartMutationService::addItem()`, review controller/entity cohesion, raise method coverage, and add truthful behavioral/UI inventory when applicable.
+
+### Constraint and verification plan
+- The supplied execution envelope forbids destructive operations. Canon052 remediation requires deleting or moving the copied non-artifact `.gating/` files; therefore that specific cleanup is blocked in this run unless the capability envelope changes.
+- Do not absorb the unrelated license edit in `composer.json` or the pre-existing owner-README replacement in `.gating/README.md`.
+- Run Composer validation and repository QA/schema gates that do not mutate protected state; do not redundantly re-run the unchanged-fingerprint Canon verifier before actual Canon052 remediation.
+
+### Verification results
+- `composer validate --strict --check-lock`: PASS.
+- `composer qa`: PASS — PHP-CS-Fixer clean, PHPUnit 75 tests / 269 assertions, PHPStan zero errors.
+- `composer schema:parity`: PASS — test database recreated, 9 migrations / 77 SQL queries, Doctrine mapping valid, schema synchronized, migrations current.
+- `composer validate:prod`: PASS.
+- No browser/mobile UI or user-observable presentation changed in this execution; runtime restart and visual capture are not applicable.
+- Full Canon/Gating rerun intentionally deferred: the supplied unchanged-fingerprint report already proves Canon052 RED, and the current envelope forbids the destructive topology cleanup required before a meaningful re-verification.
+- Console MCP dry-run confirms a reversible remediation path is technically available: `.gating/src` can be moved to `var/cache/canon052-quarantine-20260929/src`. The real move was not executed because the task envelope explicitly forbids destructive operations.
+- Console MCP dry-run confirms the remediation is technically available and reversible: moving `.gating/src` to `var/cache/canon052-quarantine-20260929/src` is accepted as a repository-local path move. The real move was not executed because the task envelope explicitly forbids destructive operations.
+
+### 2026-09-30 continuation and RC closure
+- Re-read the current worktree instead of relying on the prior snapshot. The copied consumer-local Gating engine tree had been removed externally, `.gating/README.md` was deleted, and `AGENTS.md` had been corrected to state the artifact-only consumer Gating boundary.
+- Fresh full CanonScanning run `20260930-143503` proved Canon052 GREEN and exposed one new hard rule, Canon067: `carting/cart` must own `src/Entity/Cart/CartEntity.php`.
+- Read normative Canon067 and its executable Gating mirror. Carting is not exempt; only Interfacing, Viewing, and Gating are explicit exceptions.
+- Relocated the existing root `CartEntity` to `src/Entity/Cart/CartEntity.php`, changed its namespace to `App\\Carting\\Entity\\Cart`, updated all runtime/test imports, explicit sibling-entity imports, and the PHPStan path. No Cart business semantics or Doctrine table names changed.
+- Changed PHP lint: PASS across 29 files.
+- `composer quality`: PASS — PHP-CS-Fixer clean, PHPStan zero errors, PHPUnit 75 tests / 269 assertions, profiled Gating 9 rules / 0 failures.
+- `composer schema:parity`: PASS — 9 migrations / 77 SQL queries, Doctrine mapping valid, schema synchronized, migrations current.
+- `composer test:coverage`: PASS — 75 tests / 269 assertions under Xdebug. Current coverage is lines 79.7%, methods 57.2%, branches 79.1%; Canon040 therefore remains warning-level debt, not a hard failure.
+- Final full CanonScanning run `20260930-144424`: 69 rules, 50 passed, 0 failed, 17 skipped, 2 warnings. Canon052 and Canon067 both PASS. Remaining warnings are Canon040 coverage target debt and Canon042 missing behavioral/UI coverage evidence.
+- Fresh Inspecting completed with four medium, non-autofixable PHP-structure observations (CartController cohesion; CartEntity public API/cohesion; CartMutationService::addItem() length). Semgrep timed out inside Inspecting; no high-severity Inspecting finding was produced.
+- No browser/mobile UI behavior changed, so runtime restart and visual screenshots are not applicable.
+- Git integration must include the coherent Canon052/Canon067 remediation and journal while preserving the unrelated `composer.json` license edit outside the commit.
+
+
 ## 2026-09-28 — Canon022/045 failure-runtime dependency remediation
 
 ### Reconnaissance and RC selection

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\Tests\Unit\Service;
 
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 use App\Carting\Entity\CartItemEntity;
 use App\Carting\Service\CartCheckoutReadinessService;
 use App\Carting\Service\CartLifecycleGuardService;

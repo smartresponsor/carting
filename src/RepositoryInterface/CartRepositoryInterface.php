@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Carting\RepositoryInterface;
 
-use App\Carting\Entity\CartEntity;
+use App\Carting\Entity\Cart\CartEntity;
 
 /**
  * Defines the CartRepositoryInterface responsibility used by the Carting component runtime.
