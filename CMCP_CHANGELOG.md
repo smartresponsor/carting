@@ -1,5 +1,39 @@
 # CMCP Execution Journal
 
+## 2026-10-04 — Canon054/Canon030 cart-root convergence
+
+### Reconnaissance and market baseline
+- Resolved Carting through Console MCP on branch `rc/carting-schema-parity-20260914` at HEAD `dea2b819b013f8fa64b0f4bcc58ae131d774c3b9`, synchronized 0 ahead / 0 behind with upstream.
+- Baseline worktree has six pre-existing dirty paths: `AGENTS.md`, `composer.json`, `migrations/Version20260916182500.php`, `src/Entity/Cart/CartEntity.php`, `tests/Integration/Doctrine/CartDoctrineMetadataTest.php`, and untracked `migrations/Version20261002131500CanonicalCartRootTable.php`. No staged changes exist.
+- Read Carting AGENTS/README/Composer manifests, architecture AsciiDoc, current controller/mutation/entity/schema tests, supplied CanonScanning RED and Inspecting evidence, and the required Objecting, Cruding, Viewing, Interfacing, Gating, and Canonization contracts.
+- Market baseline remains boundary-aligned: mature commerce platforms model mutable cart state as a distinct capability and keep committed order management separate; explicit line/adjustment facts and checkout completion/handoff are mature cart concerns, while catalog authority, inventory ownership, pricing/promotion engines, payment processing, fulfillment, and committed order ownership remain outside Carting.
+
+### Canon mapping and workstream split
+- Canon054 applies to current Doctrine metadata. With Carting profile `database_prefix: cart_`, the ownership stem must appear exactly once: canonical root table `cart`; duplicated `cart_cart` is non-canonical. Current Entity/test/new forward migration changes are therefore an RC-critical convergence wave.
+- Canon030 requires the complete migration chain from an empty database to converge to current Entity metadata. Historical migration `Version20260916182500` runs before the new October rename migration and therefore must continue to address legacy `cart_cart`/`uniq_cart_cart_token`; changing that historical step to `cart` would break clean-chain replay.
+- Canon052 supplied RED evidence is stale relative to later repository state recorded in this journal; the current tree materially changed after that fingerprint, so a fresh Gating run is required rather than assuming either RED or GREEN.
+- Canon021 remains satisfied by Carting-owned business routes; Objecting owns the reused audit/version system fields; Viewing/Interfacing own rendering/shell concerns.
+- RC-critical workstream: repair migration ordering semantics, verify current canonical root metadata and forward rename, run deterministic Composer/Gating/schema gates, and close only factual in-scope regressions.
+- Growth workstream: Inspecting medium observations around controller/entity cohesion and `CartMutationService::addItem()` length, method-coverage uplift, and truthful behavioral/UI coverage evidence remain non-blocking unless a fresh hard gate promotes them.
+
+### Risks and verification plan
+- Preserve the unrelated/pre-existing `composer.json` license edit and AGENTS projection edit outside the schema convergence commit unless a fresh gate proves either is required.
+- Do not rewrite historical schema semantics to pretend the canonical table always existed; use the forward migration as the convergence point.
+- Planned acceptance: strict Composer validation, production manifest validation, changed-PHP lint, QA/quality, fresh full Gating, clean-chain schema parity plus empty schema diff, post-mutation Inspecting, final Git status/branch reconciliation, coherent commit/publish when safe.
+
+### Verification results
+- Historical-migration repair: restored `Version20260916182500` to legacy `cart_cart` / `uniq_cart_cart_token` semantics so it executes correctly before the October forward rename; the file is now identical to HEAD and no longer dirty.
+- Changed PHP lint: PASS for `CartEntity.php`, `CartDoctrineMetadataTest.php`, and `Version20261002131500CanonicalCartRootTable.php`.
+- `composer validate --strict --check-lock`: PASS.
+- `composer quality`: PASS — PHP-CS-Fixer clean, PHPStan zero errors, PHPUnit 75 tests / 269 assertions, profiled Gating 10 rules / 0 failures / 0 warnings / 1 skip.
+- `composer schema:parity`: PASS from a clean disposable PostgreSQL `carting_test` database — 10 migrations / 82 SQL queries, mapping valid, database schema synchronized, migrations current.
+- `composer schema:diff`: PASS / empty — nothing to update against current Entity metadata.
+- `composer validate:prod`: PASS.
+- Refreshed coverage: 75 tests / 269 assertions; lines 79.74% (543/681), methods 57.25% (79/138), branches 79.08% (363/459). Line/method target debt remains warning-level growth work; branch coverage remains above target.
+- Fresh post-mutation Inspecting: PHPStan 0 errors; four unchanged medium, non-autofixable php-structure observations (CartController cohesion; CartEntity public API/cohesion; CartMutationService::addItem() length). No RC-critical finding was produced.
+- No browser/mobile UI, navigation, forms, or user-observable presentation behavior changed. Runtime restart, Panther/Playwright behavioral execution, and visual capture are not applicable to this Doctrine metadata/migration convergence.
+- Remaining dirty paths after repair are the pre-existing `AGENTS.md` and `composer.json` edits plus the coherent canonical root-table wave (`CartEntity`, metadata test, new forward migration) and this CMCP journal. The unrelated AGENTS/license edits remain excluded from integration.
+
 ## 2026-09-29 — Canon052 consumer-artifact verification pass
 
 ### Reconnaissance and market baseline

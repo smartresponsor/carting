@@ -18,10 +18,10 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CartRepository::class)]
-#[ORM\Table(name: 'cart_cart')]
-#[ORM\UniqueConstraint(name: 'uniq_cart_cart_token', columns: ['cart_token'])]
-#[ORM\Index(columns: ['cart_token'], name: 'cart_cart_token_idx')]
-#[ORM\Index(columns: ['owner_reference'], name: 'cart_cart_owner_reference_idx')]
+#[ORM\Table(name: 'cart')]
+#[ORM\UniqueConstraint(name: 'uniq_cart_token', columns: ['cart_token'])]
+#[ORM\Index(columns: ['cart_token'], name: 'cart_token_idx')]
+#[ORM\Index(columns: ['owner_reference'], name: 'cart_owner_reference_idx')]
 /**
  * Defines the Cart responsibility used by the Carting component runtime.
  */

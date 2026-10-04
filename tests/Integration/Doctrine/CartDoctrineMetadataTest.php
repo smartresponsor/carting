@@ -31,18 +31,18 @@ final class CartDoctrineMetadataTest extends TestCase
     {
         $metadata = $this->loadMetadata(CartEntity::class);
 
-        self::assertSame('cart_cart', $metadata->getTableName());
+        self::assertSame('cart', $metadata->getTableName());
         self::assertSame(96, $metadata->getFieldMapping('cartToken')->length);
         self::assertSame(
             ['cart_token'],
-            $metadata->table['uniqueConstraints']['uniq_cart_cart_token']['columns'] ?? null,
+            $metadata->table['uniqueConstraints']['uniq_cart_token']['columns'] ?? null,
         );
         self::assertSame(191, $metadata->getFieldMapping('ownerReference')->length);
         self::assertTrue($metadata->getFieldMapping('ownerReference')->nullable ?? false);
         self::assertSame(3, $metadata->getFieldMapping('currencyCode')->length);
         self::assertSame(32, $metadata->getFieldMapping('status')->length);
-        self::assertSame(['cart_token'], $metadata->table['indexes']['cart_cart_token_idx']['columns'] ?? null);
-        self::assertSame(['owner_reference'], $metadata->table['indexes']['cart_cart_owner_reference_idx']['columns'] ?? null);
+        self::assertSame(['cart_token'], $metadata->table['indexes']['cart_token_idx']['columns'] ?? null);
+        self::assertSame(['owner_reference'], $metadata->table['indexes']['cart_owner_reference_idx']['columns'] ?? null);
     }
 
     public function testCartItemTableContractIsExplicit(): void
