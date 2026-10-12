@@ -518,6 +518,26 @@ Selected RC-critical workstream: close Composer/canonical dependency defects and
 - Reworded the Jira delivery/import schema as platform-wide rather than consumer-wide.
 - Restored .gating/README.md to the repository-local artifact-only contract required by Canon052.
 
+## 2026-10-12 — Carting current execution checkpoint
+
+### Reconnaissance and baseline
+- Current Console MCP worktree: `rc/carting-schema-parity-20260914` at `5471a734d4db5c4c2fe2a452d8bfc3715b92d050`, upstream 0 ahead / 0 behind; user-owned dirty `AGENTS.md` and `composer.json` preserved untouched.
+- Read Carting README, AGENTS, Composer manifests, Gating profile and prior orchestration journal; consulted local Canonization Canon052 textual rule and helper repository AGENTS/README/Composer contracts (Objecting, Cruding, Viewing, Interfacing, Gating, Canonization).
+- Historic 2026-09-29 Gating RED report: Canon052 rejects copied owner files inside consumer `.gating/`; historic Inspecting report identifies four observational medium-level code-quality findings and semgrep timeout. The historic report is not proof of the current tree's condition.
+- Canon052 mapping: Carting already declares `gating/gate` dev-master, sibling symlink path, Composer gate/quality scripts and VCS-only production dependency; consumer `.gating/` must remain artifact-only. Canon021, typed Symfony roles and App namespace remain relevant; no alternate architecture introduced.
+- Current `composer quality`: PASS; PHP-CS-Fixer, PHPStan, PHPUnit 75 tests / 269 assertions, installed Gating 10 rules / 0 failures. This smaller installed profile check does not independently revalidate the historic full 68-rule scan.
+
+### RC-critical and growth tracks
+- RC-critical: synchronize production metadata terminology and revalidate; confirm current Canon052 consumer topology through a full current-fingerprint canonical scan when available. Preserve concurrent user edits and do not delete/quarantine files within this no-destructive-operations execution.
+- Growth only: increase method coverage and produce actual eligible-cohort behavioral evidence; do not fabricate coverage or promote observational Inspecting notices to hard blockers.
+
+### Implementation
+- Normalized `composer.prod.json` description to the same neutral Carting identity as the local development manifest. No runtime or UI behavior was changed.
+
+### Verification and pending integration
+- Full current-fingerprint CanonScanning/Inspecting verification remains unconfirmed; historic report must not be treated as current RED or GREEN without recheck.
+
+
 
 
 
