@@ -1,5 +1,26 @@
 # CMCP Execution Journal
 
+## 2026-10-12 — Cart quantity overflow safety
+
+### Reconnaissance and baseline
+- Console MCP confirmed branch `rc/carting-schema-parity-20260914` at `3b0bdcdbbb817c014ac681711357f496b35940c3`, upstream 0 ahead / 0 behind; pre-existing changes in `AGENTS.md` (EasyAdmin exception) and `composer.json` (license) are preserved separately.
+- Consulted Carting `AGENTS.md`, `README.md`, Composer, architecture checkout readiness, mutation source/tests, and legacy September 29 RED/Inspecting reports; checked Objecting, Cruding, Viewing, Interfacing, Gating, and Canonization READMEs and Composer contracts.
+- Read normative `Canon052GatingIntegrationRule.md`, `Canon030DoctrineSchemaParityRule.md`, and `Canon054DoctrinePhysicalIdentifierNamingRule.md`. Canon052 maps to declared Gating package/path symlink, quality script, and artifact-only consumer `.gating/`; current `composer gate` is green, while legacy report is not proof of the present state. Canon030 requires complete schema parity; Canon054 requires lower_snake_case physical identifiers and single ownership stem.
+- Commerce boundary: Carting owns mutable cart selection, cumulative quantity validation, and checkout handoff; inventory authority, catalog/pricing, orders, payment, and fulfillment belong to other components. Mature cart handling requires overflow-safe arithmetic and rejection without persistence.
+
+### Implementation and verification
+- RC-critical fix: `CartMutationService::addItem()` checks cumulative quantity against `PHP_INT_MAX` before performing arithmetic, availability-provider calls, or repository save.
+- Added regression test `testRejectsAccumulatedQuantityOverflowWithoutCallingProvidersOrSaving`.
+- Verification after patch: PHPUnit **76 tests / 273 assertions PASS**; PHPStan **PASS**; Composer Gating **PASS** (0 failed, 0 warnings, 1 skipped); PHP-CS-Fixer dry run **PASS** (0 fixes).
+- No browser/mobile UI changed; no new screenshot is applicable. Database-reset schema-parity command is intentionally not run against an unverified environment under the destructive-operation prohibition.
+- Growth workstream (non-RC): method coverage, cart controller/entity cohesion and optional browser-flow evidence; Inspecting September report contained only four medium observational findings and a Semgrep timeout.
+- Remaining: independent full CanonScanning coverage and isolated database parity when safely available; no changes to shared helper repositories.
+
+### What we have / what remains
+- Что имеем? Tested overflow guard and regression coverage with deterministic green component gates.
+- Что осталось? Full canonical cross-repository scan / disposable schema-parity evidence and Git integration state review.
+
+
 ## 2026-10-04 — Canon054/Canon030 cart-root convergence
 
 ### Reconnaissance and market baseline

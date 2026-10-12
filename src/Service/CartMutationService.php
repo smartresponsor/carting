@@ -59,7 +59,12 @@ final class CartMutationService
             }
         }
 
-        $resultingQuantity = $quantity + ($existingItem?->getQuantity() ?? 0);
+        $existingQuantity = $existingItem?->getQuantity() ?? 0;
+        if ($existingQuantity > PHP_INT_MAX - $quantity) {
+            throw new \OutOfRangeException('Cart item quantity exceeds the supported integer range.');
+        }
+
+        $resultingQuantity = $quantity + $existingQuantity;
 
         if ($this->availabilityChecker && !$this->availabilityChecker->checkAvailability($offerReference, $resultingQuantity)->available) {
             return new CartMutationResultDTO(
