@@ -118,6 +118,10 @@ final class CartMutationService
     {
         $this->lifecycleGuard->assertActive($cart, 'update item quantity on');
 
+        if ($quantity < 1) {
+            throw new \InvalidArgumentException('Cart item quantity must be at least 1.');
+        }
+
         foreach ($cart->getItems() as $item) {
             if ((int) $item->getId() === $cartItemId) {
                 if ($this->availabilityChecker && !$this->availabilityChecker->checkAvailability($item->getOfferReference(), $quantity)->available) {

@@ -148,6 +148,32 @@ final class CartMutationServiceTest extends TestCase
         $service->addItem($cart, 'offer-1', 1);
     }
 
+    public function testUpdateQuantityRejectsNonPositiveValuesBeforeAvailabilityOrPersistence(): void
+    {
+        $cart = new CartEntity('token', 'USD');
+        $cart->addItem(new CartItemEntity('offer-1', 'Offer 1', 1000, 'USD', 2));
+
+        $repository = $this->createMock(CartRepositoryInterface::class);
+        $repository->expects(self::never())->method('save');
+
+        $availability = $this->createMock(CartAvailabilityCheckerInterface::class);
+        $availability->expects(self::never())->method('checkAvailability');
+
+        $offerProvider = $this->createMock(CartOfferProviderInterface::class);
+        $offerProvider->expects(self::never())->method('provideOfferSnapshot');
+
+        $service = $this->createService($offerProvider, $availability, $repository);
+
+        try {
+            $service->updateItemQuantity($cart, 0, 0);
+            self::fail('A zero quantity must be rejected.');
+        } catch (\InvalidArgumentException $exception) {
+            self::assertSame('Cart item quantity must be at least 1.', $exception->getMessage());
+        }
+
+        self::assertSame(2, $cart->getItems()->first()->getQuantity());
+    }
+
     private function createService(
         CartOfferProviderInterface $offerProvider,
         ?CartAvailabilityCheckerInterface $availabilityChecker = null,

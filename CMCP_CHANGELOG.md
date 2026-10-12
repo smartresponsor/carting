@@ -1,5 +1,22 @@
 # CMCP Execution Journal
 
+## 2026-10-12 — reject invalid quantity before availability IO
+
+### Reconnaissance
+- Task `engine-20261004184816-carting-e8233a`; inspected current Git changes, Carting docs/Composer/source/tests, 2026-09-29 CanonScanning/Inspecting evidence, Canonization normative Canon052 and helper responsibility contracts.
+- Existing `AGENTS.md` and `composer.json` changes predate this execution and remain untouched.
+- Canon052 mapping: development Gating path/symlink and scripts are declared; historical consumer `.gating/` RED report is obsolete relative to later documented cleanup and currently passing local Gating. Canon021 retains generic CRUD in Cruding; Carting owns mutation business endpoints.
+- Mature cart systems validate mutation input before external availability/inventory integration; invalid quantities must not cause provider calls or persistence.
+- RC workstream: enforce positive update quantity at service boundary and prove zero external calls; growth workstream: coverage/cohesion uplift and optional browser evidence, not part of this change.
+
+### Implementation and gates
+- `CartMutationService::updateItemQuantity()` now rejects nonpositive quantities before availability checks, matching `CartItemEntity::changeQuantity()` invariant.
+- Added `testUpdateQuantityRejectsNonPositiveValuesBeforeAvailabilityOrPersistence`, asserting no availability call, no offer-provider call, no save and unchanged quantity.
+- `composer quality`: GREEN — PHP-CS-Fixer clean, PHPStan zero errors, PHPUnit 77 tests / 278 assertions, profiled Gating 0 failed / 0 warning / 1 skipped.
+- No UI, forms, navigation or browser behavior changed; screenshots not applicable.
+- What we have / Что имеем? Guarded and tested mutation entrypoint; deterministic local quality GREEN.
+- What remains / Что осталось до RC? Cross-repository CanonScanning/Inspecting acceptance on current fingerprint and integration-state review, plus any applicable isolated schema verification.
+
 ## 2026-10-12 — Cart quantity overflow safety
 
 ### Reconnaissance and baseline
